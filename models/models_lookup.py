@@ -6,27 +6,44 @@ models_lookup = {
     'qwen3_vl_2b_instruct': {
         "title": "Qwen3-VL-2B-Instruct",
         "color": "#A3E635",
+        "family": "qwen",
+        "type": "dense",
+        "size": "2B",
     },
     'qwen3_vl_4b_instruct': {
         "title": "Qwen3-VL-4B-Instruct",
         "color": "#84CC16",
+        "family": "qwen",
+        "type": "dense",
+        "size": "4B",
+
     },
     'qwen3_vl_8b_instruct': {
         "title": "Qwen3-VL-8B-Instruct",
         "color": "#65A30D",
+        "family": "qwen",
+        "type": "dense",
+        "size": "8B",
     },
     'qwen3_vl_32b_instruct': {
         "title": "Qwen3-VL-32B-Instruct",
         "color": "#16A34A",
+        "family": "qwen",
+        "type": "dense",
+        "size": "32B",
     },
     'qwen3_vl_30b_a3b_instruct': {
         "title": "Qwen3-VL-30B-A3B-Instruct",
         "color": "#047857",
+        "family": "qwen",
+        "type": "moe",
+        "size": "30-A4B",
     },
     # 'qwen3_vl_235b_a22b_instruct': {
     #     "title": "Qwen3-VL-235B-A22B-Instruct",
-    #     "color": "#064E3B",
-    # } <-- this guy doesnn't work 
+    #     "color": "#064E3B",        
+    #     "family": "qwen"
+    # } <-- this guy doesn't work 
 }
 
 with open("/Intern/Erin/picture_sentence_congruency/models/models_lookup.json", "w", encoding="utf-8") as file:

@@ -146,8 +146,8 @@ def lr_train(model_id, reverse_indices=[]):
     results_df = pd.DataFrame(results)
     results_df = results_df.sort_values(by=['layer_index', 'item_index']).reset_index(drop=True)
     results_df.to_csv(output_dir / "results.csv", index=False)
-    print(f"Saved decoding results to {output_dir / 'results.csv'}")
+    print(f"Decoding results for {model_id} saved.")
 
     accuracy_df = compute_layerwise_accuracy(results_df)
     accuracy_df.to_csv(output_dir / "layerwise_accuracy.csv", index=False)
-    print(f"Saved layerwise accuracy to {output_dir / 'layerwise_accuracy.csv'}")
+    print(f"Layerwise accuracy for {model_id} saved.")

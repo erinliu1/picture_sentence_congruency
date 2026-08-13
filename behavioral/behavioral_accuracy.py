@@ -54,15 +54,19 @@ def compute_accuracy(df):
 
 def extract_accuracy_VLM(model_id):
     title = models_lookup[model_id]["title"]
+    family = models_lookup[model_id]["family"]
     model_dir = MODELS_DIR / model_id
     try:
         vlm_df = pd.read_csv(model_dir / "behavior" / "ratings.csv")
     except:
         return
     fig, ax = plt.subplots(figsize=(5, 6), constrained_layout=True)
+    plot_dir = PLOTS_DIR / family
+    plot_dir.mkdir(exist_ok=True)
+
     plot_confusion(ax, vlm_df, title)
-    fig.savefig(PLOTS_DIR / f"cm_{model_id}.pdf", bbox_inches="tight")
-    print(f"Confusion matrix for {title} saved to", PLOTS_DIR / f"cm_{model_id}.pdf")
+    fig.savefig(plot_dir / f"cm_{model_id}.pdf", bbox_inches="tight")
+    print(f"Confusion matrix for {model_id} saved.")
     plt.close()
     return compute_accuracy(vlm_df)
 
@@ -71,7 +75,7 @@ def extract_accuracy_human():
     fig, ax = plt.subplots(figsize=(5, 6), constrained_layout=True)
     plot_confusion(ax, human_df, title)
     fig.savefig(PLOTS_DIR / f"cm_human.pdf", bbox_inches="tight")
-    print("Confusion matrix for human ratings saved to", PLOTS_DIR / f"cm_human.pdf")
+    print("Confusion matrix for human ratings saved.")
     plt.close()
     return compute_accuracy(human_df)
 
@@ -82,5 +86,4 @@ def save_all_accuracy():
     accuracy_records.append({"source": "human", "accuracy": extract_accuracy_human()})
     accuracy_df = pd.DataFrame(accuracy_records)
     accuracy_df.to_csv(RESULTS_DIR / "accuracy.csv", index=False)
-    print("Accuracy results saved to", RESULTS_DIR / "accuracy.csv")
-
+    print("All accuracy results saved.")

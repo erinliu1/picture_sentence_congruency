@@ -128,8 +128,12 @@ def plot_pairwise(combined_df, model_id, title):
 
     plt.grid(True, linewidth=2, alpha=0.3)
 
-    plt.savefig(PLOTS_DIR / f"pairwise_{model_id}.pdf", bbox_inches="tight")
-    print(f"Pairwise plot for {title} saved to", PLOTS_DIR / f"pairwise_{model_id}.pdf")
+    family = models_lookup[model_id]["family"]
+    plot_dir = PLOTS_DIR / family
+    plot_dir.mkdir(exist_ok=True)
+
+    plt.savefig(plot_dir / f"pairwise_{model_id}.pdf", bbox_inches="tight")
+    print(f"Pairwise plot for {model_id} saved.")
     plt.close()
 
 def extract_correlation(model_id):
@@ -162,4 +166,4 @@ def save_all_correlation():
         })
     correlation_df = pd.DataFrame(records)
     correlation_df.to_csv(RESULTS_DIR / "correlation.csv", index=False)
-    print("Correlation results saved to", RESULTS_DIR / "correlation.csv")
+    print("All correlation results saved.")

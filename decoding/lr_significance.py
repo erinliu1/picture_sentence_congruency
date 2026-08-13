@@ -15,7 +15,7 @@ def lr_significance(model_id):
     output_path = results_dir / "layerwise_significance.csv"
 
     if output_path.exists():
-        print(f"Layerwise significance results already exist for {model_id}, skipping significance testing.")
+        print(f"Layerwise significances already exists for {model_id}, skipping significance testing.")
         return
         
     observed_df = pd.read_csv(results_dir / "layerwise_accuracy.csv")
@@ -45,4 +45,4 @@ def lr_significance(model_id):
             "exceeds_95th_percentile",
         ]
     ].to_csv(output_path, index=False)
-    print(f"Layerwise significance results saved to {output_path}")
+    print(f"Layerwise significance for {model_id} saved.")

@@ -182,4 +182,4 @@ def run_all_permutations(model_id, n_permutations):
         .rename(columns={"all_accuracy": "max_accuracy"})
     )
     max_stats_df.to_csv(decoding_dir / "max_stats.csv", index=False)
-    print(f"Saved permutation results to {decoding_dir / 'permutation_layerwise_accuracies.csv'} and {decoding_dir / 'max_stats.csv'}")
+    print(f"Permutation results for {model_id} saved.")

@@ -60,4 +60,4 @@ def get_alignment(model_id):
     coefficients_df["p_value_fdr"] = multipletests(coefficients_df["p_value"], method="fdr_bh")[1]
     coefficients_df["significant_fdr"] = (coefficients_df["p_value_fdr"] < 0.05)
     coefficients_df.to_csv(output_dir / "coefficients.csv", index=False)
-    print(f"Alignment coefficients saved to {output_dir / 'coefficients.csv'}")
+    print(f"Alignment coefficients for {model_id} saved.")

@@ -11,7 +11,7 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
 PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/confidence/plots")
 PLOTS_DIR.mkdir(exist_ok=True)
     
-def plot_confidence(vlm_df, title):
+def plot_confidence(vlm_df, title, plot_dir):
     vlm_df["prediction"] = (vlm_df["rating"] > 3).map({True: "congruent", False: "incongruent"})
     vlm_df["correct"] = (vlm_df["prediction"] == vlm_df["condition"])
 
@@ -55,14 +55,17 @@ def plot_confidence(vlm_df, title):
     plt.legend(frameon=True, fontsize=22)
     plt.tight_layout()
 
-    plt.savefig(PLOTS_DIR / f"confidence_{model_id}.pdf", bbox_inches="tight")
+    plt.savefig(plot_dir / f"confidence_{model_id}.pdf", bbox_inches="tight")
 
 for model_id in sorted(models_lookup.keys()):
     title = models_lookup[model_id]["title"]
+    family = models_lookup[model_id]["family"]
     model_dir = MODELS_DIR / model_id
     try:
         vlm_csv_path = model_dir / "behavior" / "ratings.csv"
         vlm_df = pd.read_csv(vlm_csv_path)
     except:
         continue
-    plot_confidence(vlm_df, title)
+    plot_dir = PLOTS_DIR / family
+    plot_dir.mkdir(exist_ok=True)   
+    plot_confidence(vlm_df, title, plot_dir)

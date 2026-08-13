@@ -1,0 +1,6 @@
+source,peak_decoding_accuracy,peak_layer_index,total_layers,last_layer_decoding_accuracy
+qwen3_vl_2b_instruct,0.95625,14,28,0.84375
+qwen3_vl_4b_instruct,0.98125,19,36,0.8625
+qwen3_vl_8b_instruct,0.9625,18,36,0.896875
+qwen3_vl_32b_instruct,0.975,45,64,0.88125
+qwen3_vl_30b_a3b_instruct,0.978125,29,48,0.921875

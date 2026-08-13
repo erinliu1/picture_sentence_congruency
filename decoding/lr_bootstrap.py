@@ -78,4 +78,4 @@ def lr_bootstrap(model_id):
 
     all_bootstraps_df = pd.concat(rows, ignore_index=True).sort_values(by=["SEED", "layer_index"]).reset_index(drop=True)
     all_bootstraps_df.to_csv(results_dir / "all_bootstraps.csv", index=False)
-    print(f"Saved all bootstraps to {results_dir / 'all_bootstraps.csv'}")
+    print(f"Bootstraps for {model_id} saved.")

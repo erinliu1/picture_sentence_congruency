@@ -68,7 +68,11 @@ def extract_health(model_id):
     axs[0].set_xticks(range(1, 6))
 
     fig.tight_layout()
-    fig.savefig(PLOTS_DIR / f"health_{model_id}.pdf", bbox_inches="tight")
+    family = models_lookup[model_id]["family"]
+    plot_dir = PLOTS_DIR / family
+    plot_dir.mkdir(exist_ok=True)
+
+    fig.savefig(plot_dir / f"health_{model_id}.pdf", bbox_inches="tight")
     plt.close(fig)
 
     summary_rows = []
@@ -87,11 +91,11 @@ def extract_health(model_id):
 
     summary_df = pd.DataFrame(summary_rows)
     summary_df.to_csv(BEHAVIOR_DIR / "health.csv", index=False) 
-    print(f"Health results for {models_lookup[model_id]['title']} saved to", BEHAVIOR_DIR / "health.csv")
+    print(f"Health results for {model_id} saved.")
 
 
 def save_all_health():
     for model_id in sorted(models_lookup.keys()):
         extract_health(model_id)
-    print("Health results saved to", PLOTS_DIR)
+    print("All health results saved.")
 
