@@ -1,0 +1,562 @@
+[
+    {
+        "sentence_frame": "She needed to put everything in the",
+        "word_options": [
+            "library",
+            "refrigerator"
+        ]
+    },
+    {
+        "sentence_frame": "Hearing the news, he could not hide his",
+        "word_options": [
+            "disappointment",
+            "delight"
+        ]
+    },
+    {
+        "sentence_frame": "She was glad she wore her",
+        "word_options": [
+            "overcoat",
+            "sandals"
+        ]
+    },
+    {
+        "sentence_frame": "She spent months preparing for the",
+        "word_options": [
+            "marathon",
+            "exam"
+        ]
+    },
+    {
+        "sentence_frame": "She handed me the",
+        "word_options": [
+            "menu",
+            "prescription"
+        ]
+    },
+    {
+        "sentence_frame": "He was experiencing feelings of great",
+        "word_options": [
+            "distress",
+            "tranquility"
+        ]
+    },
+    {
+        "sentence_frame": "Every morning, she warmly greets the",
+        "word_options": [
+            "patients",
+            "students"
+        ]
+    },
+    {
+        "sentence_frame": "The meeting quickly reached a",
+        "word_options": [
+            "consensus",
+            "deadlock"
+        ]
+    },
+    {
+        "sentence_frame": "At the family gathering, she told them about her",
+        "word_options": [
+            "engagement",
+            "cancer"
+        ]
+    },
+    {
+        "sentence_frame": "Realizing the time, she hurried towards the",
+        "word_options": [
+            "terminal",
+            "classroom"
+        ]
+    },
+    {
+        "sentence_frame": "He realized he was out of",
+        "word_options": [
+            "cash",
+            "groceries"
+        ]
+    },
+    {
+        "sentence_frame": "As he got older, he felt more",
+        "word_options": [
+            "lonely",
+            "confident"
+        ]
+    },
+    {
+        "sentence_frame": "The crowd was overcome with",
+        "word_options": [
+            "joy",
+            "outrage"
+        ]
+    },
+    {
+        "sentence_frame": "She called to say she was on the road stuck in the",
+        "word_options": [
+            "traffic",
+            "snowstorm"
+        ]
+    },
+    {
+        "sentence_frame": "He couldn't hold back his",
+        "word_options": [
+            "laughter",
+            "frustration"
+        ]
+    },
+    {
+        "sentence_frame": "Upon arriving, she realized she forgot to bring her",
+        "word_options": [
+            "calculator",
+            "instrument"
+        ]
+    },
+    {
+        "sentence_frame": "They cheered loudly for the",
+        "word_options": [
+            "orchestra",
+            "racers"
+        ]
+    },
+    {
+        "sentence_frame": "She was planning for her",
+        "word_options": [
+            "retirement",
+            "playdate"
+        ]
+    },
+    {
+        "sentence_frame": "He walked out of the interview",
+        "word_options": [
+            "relieved",
+            "depressed"
+        ]
+    },
+    {
+        "sentence_frame": "Over the course of the semester, she lost a lot of",
+        "word_options": [
+            "friends",
+            "weight"
+        ]
+    },
+    {
+        "sentence_frame": "She put on her favorite",
+        "word_options": [
+            "lipstick",
+            "song"
+        ]
+    },
+    {
+        "sentence_frame": "She listened as her parents'",
+        "word_options": [
+            "fought",
+            "sang"
+        ]
+    },
+    {
+        "sentence_frame": "Hearing his words, she was",
+        "word_options": [
+            "skeptical",
+            "reassured"
+        ]
+    },
+    {
+        "sentence_frame": "She was getting ready for her",
+        "word_options": [
+            "graduation",
+            "operation"
+        ]
+    },
+    {
+        "sentence_frame": "They were looking at the",
+        "word_options": [
+            "bride",
+            "aftermath"
+        ]
+    },
+    {
+        "sentence_frame": "He was talking with his",
+        "word_options": [
+            "teacher",
+            "daughter"
+        ]
+    },
+    {
+        "sentence_frame": "He liked to spend time with his",
+        "word_options": [
+            "roommate",
+            "grandma"
+        ]
+    },
+    {
+        "sentence_frame": "He was arguing with his",
+        "word_options": [
+            "brother",
+            "mother"
+        ]
+    },
+    {
+        "sentence_frame": "They got along in",
+        "word_options": [
+            "preschool",
+            "prison"
+        ]
+    },
+    {
+        "sentence_frame": "When she opened the exam, she felt",
+        "word_options": [
+            "hopeful",
+            "hopeless"
+        ]
+    },
+    {
+        "sentence_frame": "When she opened her grade, she was",
+        "word_options": [
+            "appalled",
+            "overjoyed"
+        ]
+    },
+    {
+        "sentence_frame": "His employer gave him words of",
+        "word_options": [
+            "reprimand",
+            "encouragement"
+        ]
+    },
+    {
+        "sentence_frame": "He gestured from his car",
+        "word_options": [
+            "angrily",
+            "cordially"
+        ]
+    },
+    {
+        "sentence_frame": "He looked at me in a way that felt",
+        "word_options": [
+            "accusatory",
+            "flirtatious"
+        ]
+    },
+    {
+        "sentence_frame": "She looked over",
+        "word_options": [
+            "disapprovingly",
+            "lovingly"
+        ]
+    },
+    {
+        "sentence_frame": "He noticed she was being very",
+        "word_options": [
+            "playful",
+            "distant"
+        ]
+    },
+    {
+        "sentence_frame": "I looked around the store for",
+        "word_options": [
+            "headphones",
+            "mangoes"
+        ]
+    },
+    {
+        "sentence_frame": "The kids played in the",
+        "word_options": [
+            "playroom",
+            "park"
+        ]
+    },
+    {
+        "sentence_frame": "The kids played in the",
+        "word_options": [
+            "bedroom",
+            "backyard"
+        ]
+    },
+    {
+        "sentence_frame": "She held her hands",
+        "word_options": [
+            "solemnly",
+            "excitedly"
+        ]
+    },
+    {
+        "sentence_frame": "She looked around but could not find her",
+        "word_options": [
+            "car",
+            "sock"
+        ]
+    },
+    {
+        "sentence_frame": "Everyone stared because she was",
+        "word_options": [
+            "overdressed",
+            "naked"
+        ]
+    },
+    {
+        "sentence_frame": "At the party, she was",
+        "word_options": [
+            "shy",
+            "lively"
+        ]
+    },
+    {
+        "sentence_frame": "His comment made her",
+        "word_options": [
+            "offended",
+            "flattered"
+        ]
+    },
+    {
+        "sentence_frame": "He had a conversation with his",
+        "word_options": [
+            "grandkid",
+            "cellmate"
+        ]
+    },
+    {
+        "sentence_frame": "He couldn't believe he had gotten",
+        "word_options": [
+            "promoted",
+            "fired"
+        ]
+    },
+    {
+        "sentence_frame": "She received the news about the",
+        "word_options": [
+            "shooting",
+            "celebration"
+        ]
+    },
+    {
+        "sentence_frame": "He was looking for a",
+        "word_options": [
+            "crayon",
+            "beer"
+        ]
+    },
+    {
+        "sentence_frame": "She was looking for a",
+        "word_options": [
+            "waiter",
+            "taxi"
+        ]
+    },
+    {
+        "sentence_frame": "She was looking for her",
+        "word_options": [
+            "parents",
+            "keys"
+        ]
+    },
+    {
+        "sentence_frame": "The cat leaped towards the",
+        "word_options": [
+            "sofa",
+            "sky"
+        ]
+    },
+    {
+        "sentence_frame": "He struggled with",
+        "word_options": [
+            "obesity",
+            "homework"
+        ]
+    },
+    {
+        "sentence_frame": "He was so tired he fell asleep during the",
+        "word_options": [
+            "quiz",
+            "commute"
+        ]
+    },
+    {
+        "sentence_frame": "She was experiencing an intense",
+        "word_options": [
+            "migraine",
+            "excitement"
+        ]
+    },
+    {
+        "sentence_frame": "After many months, she was excited to finally see her",
+        "word_options": [
+            "niece",
+            "husband"
+        ]
+    },
+    {
+        "sentence_frame": "She was excited to watch the",
+        "word_options": [
+            "film",
+            "sunrise"
+        ]
+    },
+    {
+        "sentence_frame": "They chatted at the",
+        "word_options": [
+            "lecture",
+            "banquet"
+        ]
+    },
+    {
+        "sentence_frame": "She was looking for a",
+        "word_options": [
+            "drink",
+            "textbook"
+        ]
+    },
+    {
+        "sentence_frame": "She was getting ready to go play in the",
+        "word_options": [
+            "pool",
+            "snow"
+        ]
+    },
+    {
+        "sentence_frame": "He was glad he did not forget his",
+        "word_options": [
+            "passport",
+            "plushy"
+        ]
+    },
+    {
+        "sentence_frame": "She was very close to her",
+        "word_options": [
+            "sister",
+            "father"
+        ]
+    },
+    {
+        "sentence_frame": "He had been looking forward to see the",
+        "word_options": [
+            "game",
+            "sunset"
+        ]
+    },
+    {
+        "sentence_frame": "She was came home for the",
+        "word_options": [
+            "holidays",
+            "funeral"
+        ]
+    },
+    {
+        "sentence_frame": "She found out about his",
+        "word_options": [
+            "grades",
+            "affair"
+        ]
+    },
+    {
+        "sentence_frame": "I rushed right over after hearing about his",
+        "word_options": [
+            "arrest",
+            "stroke"
+        ]
+    },
+    {
+        "sentence_frame": "He needed his",
+        "word_options": [
+            "pacifier",
+            "coffee"
+        ]
+    },
+    {
+        "sentence_frame": "They lined up for",
+        "word_options": [
+            "sweets",
+            "sentencing"
+        ]
+    },
+    {
+        "sentence_frame": "She was taking a",
+        "word_options": [
+            "nap",
+            "selfie"
+        ]
+    },
+    {
+        "sentence_frame": "She was changing her",
+        "word_options": [
+            "diaper",
+            "tire"
+        ]
+    },
+    {
+        "sentence_frame": "He had another round of",
+        "word_options": [
+            "chemotherapy",
+            "golf"
+        ]
+    },
+    {
+        "sentence_frame": "He listened to the",
+        "word_options": [
+            "thunder",
+            "lullaby"
+        ]
+    },
+    {
+        "sentence_frame": "He changed into his",
+        "word_options": [
+            "pajamas",
+            "uniform"
+        ]
+    },
+    {
+        "sentence_frame": "She changed into her",
+        "word_options": [
+            "gown",
+            "sweats"
+        ]
+    },
+    {
+        "sentence_frame": "He needed to make the",
+        "word_options": [
+            "deadline",
+            "bed"
+        ]
+    },
+    {
+        "sentence_frame": "She didn't want to go to",
+        "word_options": [
+            "kindergarten",
+            "jail"
+        ]
+    },
+    {
+        "sentence_frame": "He was being",
+        "word_options": [
+            "interrogated",
+            "tickled"
+        ]
+    },
+    {
+        "sentence_frame": "She was building a",
+        "word_options": [
+            "sandcastle",
+            "snowman"
+        ]
+    },
+    {
+        "sentence_frame": "They were making",
+        "word_options": [
+            "music",
+            "pizza"
+        ]
+    },
+    {
+        "sentence_frame": "They were watching the",
+        "word_options": [
+            "playoffs",
+            "cartoon"
+        ]
+    },
+    {
+        "sentence_frame": "She was struggling with",
+        "word_options": [
+            "alcoholism",
+            "academics"
+        ]
+    }
+]

@@ -1,10 +1,8 @@
+.venv/
 .env
-.venv
-cross_validation_data/bootstraps
-cross_validation_data/permutations
-pt_all.pt
-survey_assignments
-survey_responses
-generated_qsf
-qualtrics_image_mapping.json
-all_hidden_states
+.env.*
+__pycache__/
+*.pt
+.DS_Store
+.vscode/
+models/*/decoding/permutations/

@@ -1,0 +1,710 @@
+{
+  "academics.png": {
+    "graphic_id": "IM_URNtzXtbqL7eUmA",
+    "url": ""
+  },
+  "library.png": {
+    "graphic_id": "IM_VzafRSjErA3JC6k",
+    "url": ""
+  },
+  "accusatory.png": {
+    "graphic_id": "IM_WWdGBWwUaC7GhFt",
+    "url": ""
+  },
+  "affair.png": {
+    "graphic_id": "IM_3JKacuz77CdelJU",
+    "url": ""
+  },
+  "aftermath.png": {
+    "graphic_id": "IM_FToRrL6Xxf1jj3Z",
+    "url": ""
+  },
+  "alcoholism.png": {
+    "graphic_id": "IM_u1B1aGL9mjk43xk",
+    "url": ""
+  },
+  "angrily.png": {
+    "graphic_id": "IM_rcjTUd95NhkywFd",
+    "url": ""
+  },
+  "appalled.png": {
+    "graphic_id": "IM_pQJgqDr3yJMH4dT",
+    "url": ""
+  },
+  "arrest.png": {
+    "graphic_id": "IM_ePE94z7TXhGPBst",
+    "url": ""
+  },
+  "backyard.png": {
+    "graphic_id": "IM_hF9vetG1E3bCXKg",
+    "url": ""
+  },
+  "banquet.png": {
+    "graphic_id": "IM_pmJw937gWVdIpOD",
+    "url": ""
+  },
+  "bed.png": {
+    "graphic_id": "IM_nkVYyH4l5pAWhcD",
+    "url": ""
+  },
+  "bedroom.png": {
+    "graphic_id": "IM_lOKhzpy28J1AjPK",
+    "url": ""
+  },
+  "beer.png": {
+    "graphic_id": "IM_2n1AaTpMXo9laRm",
+    "url": ""
+  },
+  "breathe.png": {
+    "graphic_id": "IM_2RbSrulrivDd2Q6",
+    "url": ""
+  },
+  "bride.png": {
+    "graphic_id": "IM_mlBkMTCTw5uznUx",
+    "url": ""
+  },
+  "brother.png": {
+    "graphic_id": "IM_zrSJJzmk7ssabkl",
+    "url": ""
+  },
+  "calculator.png": {
+    "graphic_id": "IM_HpZ06JgLkdDHuA9",
+    "url": ""
+  },
+  "car.png": {
+    "graphic_id": "IM_nGMXpXGlrtHqMpR",
+    "url": ""
+  },
+  "cartoon.png": {
+    "graphic_id": "IM_YwWTd5fh3A5Xk6z",
+    "url": ""
+  },
+  "cash.png": {
+    "graphic_id": "IM_B2YuCN97otHJn1D",
+    "url": ""
+  },
+  "celebration.png": {
+    "graphic_id": "IM_xSpuOA1i9gBcWgN",
+    "url": ""
+  },
+  "cellmate.png": {
+    "graphic_id": "IM_9dOQAruExyCuPkd",
+    "url": ""
+  },
+  "chemotherapy.png": {
+    "graphic_id": "IM_5qj8bPZELqBif3G",
+    "url": ""
+  },
+  "classroom.png": {
+    "graphic_id": "IM_KKHTHAPxURTLpYH",
+    "url": ""
+  },
+  "coffee.png": {
+    "graphic_id": "IM_Fqfi2jn45jc8PGQ",
+    "url": ""
+  },
+  "commute.png": {
+    "graphic_id": "IM_0Fa5nKzypcz0Zql",
+    "url": ""
+  },
+  "confident.png": {
+    "graphic_id": "IM_0E71xSOB9BdxUlH",
+    "url": ""
+  },
+  "consensus.png": {
+    "graphic_id": "IM_OxJlWb9xTQHULhh",
+    "url": ""
+  },
+  "cordially.png": {
+    "graphic_id": "IM_kygpFqRGKDX8Cdu",
+    "url": ""
+  },
+  "coworker.png": {
+    "graphic_id": "IM_48MVSOJ6h6Mtv0F",
+    "url": ""
+  },
+  "crayon.png": {
+    "graphic_id": "IM_r1otfinAaA6vHX2",
+    "url": ""
+  },
+  "daughter.png": {
+    "graphic_id": "IM_yOGDtqV3xbiTCBu",
+    "url": ""
+  },
+  "deadline.png": {
+    "graphic_id": "IM_DpNsQmkfBAm4l6g",
+    "url": ""
+  },
+  "deadlock.png": {
+    "graphic_id": "IM_wx5GIbJVZvzlMbx",
+    "url": ""
+  },
+  "delight.png": {
+    "graphic_id": "IM_j7ElzhlqoReGXSQ",
+    "url": ""
+  },
+  "depressed.png": {
+    "graphic_id": "IM_LCaiZkdZlGx84Sv",
+    "url": ""
+  },
+  "diaper.png": {
+    "graphic_id": "IM_Ue0eDKruzIRQEbQ",
+    "url": ""
+  },
+  "disappointment.png": {
+    "graphic_id": "IM_Be6bK4gRNcSX4Gf",
+    "url": ""
+  },
+  "disapprovingly.png": {
+    "graphic_id": "IM_t4NKqaOqYmdE2eD",
+    "url": ""
+  },
+  "distant.png": {
+    "graphic_id": "IM_BZdhLixgc89WtJn",
+    "url": ""
+  },
+  "distress.png": {
+    "graphic_id": "IM_RaEZ92971OlOtGs",
+    "url": ""
+  },
+  "drink.png": {
+    "graphic_id": "IM_LtMRwwe8xs331z1",
+    "url": ""
+  },
+  "encouragement.png": {
+    "graphic_id": "IM_FxuAdw3j1KvYCLG",
+    "url": ""
+  },
+  "engagement.png": {
+    "graphic_id": "IM_o8VONGBd4OU66YC",
+    "url": ""
+  },
+  "exam.png": {
+    "graphic_id": "IM_BZ2K69m8QCdKZrn",
+    "url": ""
+  },
+  "excitedly.png": {
+    "graphic_id": "IM_nhptyV4Bm9Ul7U8",
+    "url": ""
+  },
+  "excitement.png": {
+    "graphic_id": "IM_rTOUnQw1gICxWvK",
+    "url": ""
+  },
+  "father.png": {
+    "graphic_id": "IM_j2KJUtmejdsnRvc",
+    "url": ""
+  },
+  "film.png": {
+    "graphic_id": "IM_TZIiUHUDIR0ItlD",
+    "url": ""
+  },
+  "fired.png": {
+    "graphic_id": "IM_TbyZnUMs7EQRu5o",
+    "url": ""
+  },
+  "flattered.png": {
+    "graphic_id": "IM_olHmTCldafe37c0",
+    "url": ""
+  },
+  "flirtatious.png": {
+    "graphic_id": "IM_aNUJi9h8o6ysn9b",
+    "url": ""
+  },
+  "fought.png": {
+    "graphic_id": "IM_rLGzpNTnDrbgNVS",
+    "url": ""
+  },
+  "freethrows.png": {
+    "graphic_id": "IM_KNjcwRZNT0tGaqe",
+    "url": ""
+  },
+  "friends.png": {
+    "graphic_id": "IM_lejLCMzvqw7y2BH",
+    "url": ""
+  },
+  "frustration.png": {
+    "graphic_id": "IM_brpv4bdv46uQZaW",
+    "url": ""
+  },
+  "funeral.png": {
+    "graphic_id": "IM_qpYsTsXz9Ceo7BD",
+    "url": ""
+  },
+  "game.png": {
+    "graphic_id": "IM_HUKGOZwtOLk2hmW",
+    "url": ""
+  },
+  "golf.png": {
+    "graphic_id": "IM_bTP6DIjWcKfx5Eb",
+    "url": ""
+  },
+  "gown.png": {
+    "graphic_id": "IM_oe0KcJrjINMdcqP",
+    "url": ""
+  },
+  "grades.png": {
+    "graphic_id": "IM_LKSLpTNYNsCdYVX",
+    "url": ""
+  },
+  "graduation.png": {
+    "graphic_id": "IM_NQ3UnBxxVsU2kPN",
+    "url": ""
+  },
+  "grandkid.png": {
+    "graphic_id": "IM_drz9WSwE83Ek3Rr",
+    "url": ""
+  },
+  "grandma.png": {
+    "graphic_id": "IM_VcJQWhlDiJkihtr",
+    "url": ""
+  },
+  "gratitude.png": {
+    "graphic_id": "IM_doO6C9SSNl8KDEO",
+    "url": ""
+  },
+  "groceries.png": {
+    "graphic_id": "IM_I95HWxdVRaIco7Q",
+    "url": ""
+  },
+  "headphones.png": {
+    "graphic_id": "IM_pMFL2ucenflPxbX",
+    "url": ""
+  },
+  "holidays.png": {
+    "graphic_id": "IM_JgbROzKB6cApPKT",
+    "url": ""
+  },
+  "homework.png": {
+    "graphic_id": "IM_HATHo2iVOeClWfQ",
+    "url": ""
+  },
+  "hopeful.png": {
+    "graphic_id": "IM_9kahmBRYHLxnEBe",
+    "url": ""
+  },
+  "hopeless.png": {
+    "graphic_id": "IM_QBWmajJ516mPdf5",
+    "url": ""
+  },
+  "husband.png": {
+    "graphic_id": "IM_uBfjtRhwe1maiPe",
+    "url": ""
+  },
+  "instrument.png": {
+    "graphic_id": "IM_iqnXQGJL8c296ui",
+    "url": ""
+  },
+  "interrogated.png": {
+    "graphic_id": "IM_VsTm6EKNKrqpzUS",
+    "url": ""
+  },
+  "jail.png": {
+    "graphic_id": "IM_7XrSUUjDEEJQlf3",
+    "url": ""
+  },
+  "joy.png": {
+    "graphic_id": "IM_1icYYtGGqM2Ztxz",
+    "url": ""
+  },
+  "keys.png": {
+    "graphic_id": "IM_sS0eKaHds4qpY39",
+    "url": ""
+  },
+  "kindergarten.png": {
+    "graphic_id": "IM_d0wD31RbYyo7X6K",
+    "url": ""
+  },
+  "laughter.png": {
+    "graphic_id": "IM_n5qqCPDaxSczXXX",
+    "url": ""
+  },
+  "lecture.png": {
+    "graphic_id": "IM_jocsjMF2zjUA7iJ",
+    "url": ""
+  },
+  "lipstick.png": {
+    "graphic_id": "IM_pTK0VfJ4JmUXuYU",
+    "url": ""
+  },
+  "lively.png": {
+    "graphic_id": "IM_12aD2K4FPoSHTdR",
+    "url": ""
+  },
+  "lonely.png": {
+    "graphic_id": "IM_F6KILyf0ix3YC7Q",
+    "url": ""
+  },
+  "lovingly.png": {
+    "graphic_id": "IM_69KycprLhNyhEph",
+    "url": ""
+  },
+  "lullaby.png": {
+    "graphic_id": "IM_5QS1UQK8HauGFY9",
+    "url": ""
+  },
+  "mangoes.png": {
+    "graphic_id": "IM_i1M79hqLtf4dOAe",
+    "url": ""
+  },
+  "marathon.png": {
+    "graphic_id": "IM_yxQqvWBb5fdVHfV",
+    "url": ""
+  },
+  "math.png": {
+    "graphic_id": "IM_80ftaamkE0gnDbu",
+    "url": ""
+  },
+  "menu.png": {
+    "graphic_id": "IM_AFQex7l6GX70VUr",
+    "url": ""
+  },
+  "migraine.png": {
+    "graphic_id": "IM_V76lxIHahzVY8TH",
+    "url": ""
+  },
+  "cancer.png": {
+    "graphic_id": "IM_mcp2HaDLjErbyPV",
+    "url": ""
+  },
+  "mother.png": {
+    "graphic_id": "IM_cECAmDoy0eVlklD",
+    "url": ""
+  },
+  "music.png": {
+    "graphic_id": "IM_J4TVjYKZOT4SPuK",
+    "url": ""
+  },
+  "naked.png": {
+    "graphic_id": "IM_xWNTutawYFLGnLc",
+    "url": ""
+  },
+  "nap.png": {
+    "graphic_id": "IM_Lj7XCSWadPjauus",
+    "url": ""
+  },
+  "neighbor.png": {
+    "graphic_id": "IM_UA9KgiA7UAo4pl9",
+    "url": ""
+  },
+  "niece.png": {
+    "graphic_id": "IM_147CETyBbLtGcgS",
+    "url": ""
+  },
+  "obesity.png": {
+    "graphic_id": "IM_7tud9sdH2Q8tcII",
+    "url": ""
+  },
+  "offended.png": {
+    "graphic_id": "IM_sOAzSJPe7NRRhWt",
+    "url": ""
+  },
+  "operation.png": {
+    "graphic_id": "IM_ZzuAc65IAYMApwh",
+    "url": ""
+  },
+  "orchestra.png": {
+    "graphic_id": "IM_8IVEEHhJjcLamfN",
+    "url": ""
+  },
+  "outrage.png": {
+    "graphic_id": "IM_aLlubGb4qhpNzB8",
+    "url": ""
+  },
+  "overcoat.png": {
+    "graphic_id": "IM_6wKmU02XDtNMU67",
+    "url": ""
+  },
+  "overdressed.png": {
+    "graphic_id": "IM_1iPkicivOot7HFT",
+    "url": ""
+  },
+  "overjoyed.png": {
+    "graphic_id": "IM_V2oUfAzbGpf7vTB",
+    "url": ""
+  },
+  "pacifier.png": {
+    "graphic_id": "IM_j7jale2HE2J75JZ",
+    "url": ""
+  },
+  "pajamas.png": {
+    "graphic_id": "IM_4DdYhcN2Wbmwqwi",
+    "url": ""
+  },
+  "parents.png": {
+    "graphic_id": "IM_JutVQbh2FhFXHb9",
+    "url": ""
+  },
+  "park.png": {
+    "graphic_id": "IM_Y7q9WCKkbkyOyvG",
+    "url": ""
+  },
+  "passport.png": {
+    "graphic_id": "IM_gNdLIMZN3fUKIJn",
+    "url": ""
+  },
+  "patients.png": {
+    "graphic_id": "IM_BPciveh7zD0nTY9",
+    "url": ""
+  },
+  "pizza.png": {
+    "graphic_id": "IM_a8AQD3Sj8f93dGR",
+    "url": ""
+  },
+  "playdate.png": {
+    "graphic_id": "IM_lyRkRBqE41GTtrI",
+    "url": ""
+  },
+  "playful.png": {
+    "graphic_id": "IM_PWY7Eu8prb7sHil",
+    "url": ""
+  },
+  "playoffs.png": {
+    "graphic_id": "IM_17Ko9lwXALbtGy3",
+    "url": ""
+  },
+  "playroom.png": {
+    "graphic_id": "IM_P3tY6ya0P2HoYOh",
+    "url": ""
+  },
+  "plushy.png": {
+    "graphic_id": "IM_8YwYB085Qd2h3w9",
+    "url": ""
+  },
+  "pool.png": {
+    "graphic_id": "IM_Pngt5WL4rJTDfCG",
+    "url": ""
+  },
+  "preschool.png": {
+    "graphic_id": "IM_t6k8ipEr6652rNQ",
+    "url": ""
+  },
+  "prescription.png": {
+    "graphic_id": "IM_k7rI962SL3xeFE1",
+    "url": ""
+  },
+  "prison.png": {
+    "graphic_id": "IM_k9ev7N4h5XAP7VK",
+    "url": ""
+  },
+  "promoted.png": {
+    "graphic_id": "IM_lzFZXJMamOra3uF",
+    "url": ""
+  },
+  "quiz.png": {
+    "graphic_id": "IM_2gZkcp5hnA2315Y",
+    "url": ""
+  },
+  "racers.png": {
+    "graphic_id": "IM_lL5LkBOOk3ir6YV",
+    "url": ""
+  },
+  "reassured.png": {
+    "graphic_id": "IM_NelsWQsRLViN7p0",
+    "url": ""
+  },
+  "refrigerator.png": {
+    "graphic_id": "IM_za2l1c5C0ySQdv8",
+    "url": ""
+  },
+  "relieved.png": {
+    "graphic_id": "IM_RD8gSEkDQnzGBuU",
+    "url": ""
+  },
+  "reprimand.png": {
+    "graphic_id": "IM_n0yeVhlu83JGLLS",
+    "url": ""
+  },
+  "retirement.png": {
+    "graphic_id": "IM_eGmvEC2MDmJBRKm",
+    "url": ""
+  },
+  "roof.png": {
+    "graphic_id": "IM_bCAY4gu2VrXMgxA",
+    "url": ""
+  },
+  "roommate.png": {
+    "graphic_id": "IM_Zybp3SnGXhmvBxv",
+    "url": ""
+  },
+  "sandals.png": {
+    "graphic_id": "IM_3v42JMbpH7rZDYb",
+    "url": ""
+  },
+  "sandcastle.png": {
+    "graphic_id": "IM_Z0zT9rdcaEH7Ktd",
+    "url": ""
+  },
+  "sang.png": {
+    "graphic_id": "IM_kbt5Djw1GlFo8Wr",
+    "url": ""
+  },
+  "seat.png": {
+    "graphic_id": "IM_t5883HClM8Hq1Rm",
+    "url": ""
+  },
+  "selfie.png": {
+    "graphic_id": "IM_olXA9SKOfJ27aNT",
+    "url": ""
+  },
+  "sentencing.png": {
+    "graphic_id": "IM_Wy1dzZSRBVZiBha",
+    "url": ""
+  },
+  "shooting.png": {
+    "graphic_id": "IM_6ir0z6mCeAbBXz1",
+    "url": ""
+  },
+  "shy.png": {
+    "graphic_id": "IM_SiVSPPHIoKhDEOv",
+    "url": ""
+  },
+  "siblings.png": {
+    "graphic_id": "IM_emBiXzXy4rqwFfJ",
+    "url": ""
+  },
+  "sister.png": {
+    "graphic_id": "IM_SRYBfZXBLorm6mT",
+    "url": ""
+  },
+  "skeptical.png": {
+    "graphic_id": "IM_jbbtN6QJEuZkrhY",
+    "url": ""
+  },
+  "sky.png": {
+    "graphic_id": "IM_uwcsgbHZYUsZUhI",
+    "url": ""
+  },
+  "sleep.png": {
+    "graphic_id": "IM_sTFTsF9LxlEQtNa",
+    "url": ""
+  },
+  "snow.png": {
+    "graphic_id": "IM_SmL2nq2N9RpSihk",
+    "url": ""
+  },
+  "snowman.png": {
+    "graphic_id": "IM_1k6l3CxuyGw8bJS",
+    "url": ""
+  },
+  "snowstorm.png": {
+    "graphic_id": "IM_ImugfzPrSUVNwtw",
+    "url": ""
+  },
+  "sock.png": {
+    "graphic_id": "IM_VxSJPaa9FtZEy8D",
+    "url": ""
+  },
+  "sofa.png": {
+    "graphic_id": "IM_E63b2i6gLEKRM4u",
+    "url": ""
+  },
+  "solemnly.png": {
+    "graphic_id": "IM_ryEqo40mpHJILcP",
+    "url": ""
+  },
+  "song.png": {
+    "graphic_id": "IM_aGlfziLMktPgyXT",
+    "url": ""
+  },
+  "stomachache.png": {
+    "graphic_id": "IM_Fs87XB0azLcRwbL",
+    "url": ""
+  },
+  "stroke.png": {
+    "graphic_id": "IM_vkajRQRKUb4TmhE",
+    "url": ""
+  },
+  "students.png": {
+    "graphic_id": "IM_vCQmkedk1TaIUuJ",
+    "url": ""
+  },
+  "summer.png": {
+    "graphic_id": "IM_F25YrtguCvu7yHU",
+    "url": ""
+  },
+  "sunrise.png": {
+    "graphic_id": "IM_XHMffEOkvNcNZcu",
+    "url": ""
+  },
+  "sunset.png": {
+    "graphic_id": "IM_t9mjIePPGPnmatH",
+    "url": ""
+  },
+  "sweats.png": {
+    "graphic_id": "IM_ahglBYuU298ZkBm",
+    "url": ""
+  },
+  "sweets.png": {
+    "graphic_id": "IM_vHoikEnWwI3m5S6",
+    "url": ""
+  },
+  "taxi.png": {
+    "graphic_id": "IM_ODMGJi7Dx4XylzU",
+    "url": ""
+  },
+  "teacher.png": {
+    "graphic_id": "IM_ReDxUNZkauqfmyJ",
+    "url": ""
+  },
+  "tears.png": {
+    "graphic_id": "IM_eTgKqIS2Mg3atcI",
+    "url": ""
+  },
+  "terminal.png": {
+    "graphic_id": "IM_RshDAFqloEFNT49",
+    "url": ""
+  },
+  "textbook.png": {
+    "graphic_id": "IM_uH4TQdUPJHh5Ap4",
+    "url": ""
+  },
+  "thunder.png": {
+    "graphic_id": "IM_2FCkXoHaDhaEWDz",
+    "url": ""
+  },
+  "tickled.png": {
+    "graphic_id": "IM_I5y53yt5smOxSCW",
+    "url": ""
+  },
+  "tire.png": {
+    "graphic_id": "IM_HvHGKw0G2PTHq5F",
+    "url": ""
+  },
+  "toilet.png": {
+    "graphic_id": "IM_BgAFalIjDfrt40U",
+    "url": ""
+  },
+  "toys.png": {
+    "graphic_id": "IM_Li3RBu4CioXWn3i",
+    "url": ""
+  },
+  "traffic.png": {
+    "graphic_id": "IM_dOO2tEKvh7S5nax",
+    "url": ""
+  },
+  "tranquility.png": {
+    "graphic_id": "IM_nwVTsEu3MSxM3l9",
+    "url": ""
+  },
+  "uncertainty.png": {
+    "graphic_id": "IM_7JeMqETnsBr7FTp",
+    "url": ""
+  },
+  "uniform.png": {
+    "graphic_id": "IM_O1rwYEuys3QSw0i",
+    "url": ""
+  },
+  "waiter.png": {
+    "graphic_id": "IM_rIFXUpMDJiW0foh",
+    "url": ""
+  },
+  "weight.png": {
+    "graphic_id": "IM_8FcdgsILfhkzdgl",
+    "url": ""
+  },
+  "widow.png": {
+    "graphic_id": "IM_Jpgsa5xzBQT0oOL",
+    "url": ""
+  }
+}
