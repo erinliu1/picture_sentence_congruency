@@ -81,7 +81,7 @@ def extract_accuracy_human():
 
 def save_all_accuracy():
     accuracy_records = []
-    for model_id in sorted(models_lookup.keys()):
+    for model_id in models_lookup.keys():
         accuracy_records.append({"source": model_id, "accuracy": extract_accuracy_VLM(model_id)})
     accuracy_records.append({"source": "human", "accuracy": extract_accuracy_human()})
     accuracy_df = pd.DataFrame(accuracy_records)

@@ -1,6 +1,6 @@
 import json
 import os
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +10,7 @@ import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from tqdm import tqdm
 
 MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
@@ -25,6 +26,13 @@ N_FOLDS = len(cv_lookup)
 # Set per model, before creating each model's ProcessPoolExecutor, so the
 # forked workers inherit them already populated (see the __main__ loop).
 ALL_HIDDEN_STATES = {}
+# fold -> {"train": {...}, "test": {...}}, each {"X", "item_index",
+# "base_label"}. The hidden-state values and fold membership never change
+# across permutation seeds (only which items get their label flipped does),
+# so these are built once per model in run_all_permutations and reused by
+# every seed/worker instead of being re-gathered from ALL_HIDDEN_STATES on
+# every single permutation.
+FOLD_DATA = {}
 PERMUTATIONS_DIR = None
 
 def unpack_item(item):
@@ -46,13 +54,23 @@ def get_label(condition, reverse=False):
         else:
             return 0
 
-def get_item(pt_list, reverse=False):
-    X, y = [], []
-    for item_name in pt_list:
-        item_index, image_word, condition = unpack_item(item_name)
-        X.append(ALL_HIDDEN_STATES[item_name])
-        y.append(get_label(condition, reverse=reverse))
-    return X, y
+def build_fold_data(items_dict):
+    # items_dict: {item_index: [pt_filename, ...]}, e.g. cv_lookup[fold]["train"].
+    # Returns the stacked hidden states plus, per row, the source item_index
+    # and its non-reversed ("base") label, so a seed's reverse flip can later
+    # be applied with a single vectorized where() instead of a Python loop.
+    X_rows, item_indices, base_labels = [], [], []
+    for item_index, pt_list in items_dict.items():
+        for item_name in pt_list:
+            _, _, condition = unpack_item(item_name)
+            X_rows.append(ALL_HIDDEN_STATES[item_name])
+            item_indices.append(int(item_index))
+            base_labels.append(get_label(condition, reverse=False))
+    return {
+        "X": np.stack(X_rows, axis=0),
+        "item_index": np.asarray(item_indices, dtype=np.int64),
+        "base_label": np.asarray(base_labels, dtype=np.int64),
+    }
 
 def compute_layerwise_accuracy(predictions):
     # predictions: list of (layer_index, condition, passed) tuples
@@ -81,26 +99,27 @@ def run_permutation(seed):
         return pd.read_csv(checkpoint_path)
 
     rng = np.random.default_rng(seed)
-    item_indices = np.arange(80)
-    reverse_indices = set(item_indices[rng.random(len(item_indices)) < 0.5])
+    # reverse_by_item[item_index] tells whether that item's label is flipped
+    # for this seed; indexing it with a fold's item_index array (fancy
+    # indexing) is a drop-in vectorized replacement for the old
+    # "int(item_index) in reverse_indices" set-membership check per row.
+    reverse_by_item = rng.random(80) < 0.5
 
     predictions = []
 
     for fold in range(1, N_FOLDS + 1):
-        train_items = cv_lookup[str(fold)]["train"]
-        test_items = cv_lookup[str(fold)]["test"]
+        train = FOLD_DATA[fold]["train"]
+        test = FOLD_DATA[fold]["test"]
 
-        X_train, y_train = [], []
-        for item_index, pt_list in train_items.items():
-            reverse = int(item_index) in reverse_indices
-            X_item, y_item = get_item(pt_list, reverse=reverse)
-            X_train.extend(X_item)
-            y_train.extend(y_item)
+        X = train["X"] # (288, 36, 4096) -- identical across all seeds
+        train_reverse = reverse_by_item[train["item_index"]]
+        y = np.where(train_reverse, 1 - train["base_label"], train["base_label"])
 
-        X = np.stack(X_train, axis=0) # (288, 36, 4096)
-        y = np.asarray(y_train, dtype=np.int64) # (288,)
+        X_test = test["X"] # (n_test, 36, 4096) -- identical across all seeds
+        test_reverse = reverse_by_item[test["item_index"]]
+        y_test = np.where(test_reverse, 1 - test["base_label"], test["base_label"])
+        test_conditions = np.where(y_test == 1, 'congruent', 'incongruent')
 
-        classifiers = {}
         N_LAYERS = X.shape[1]
 
         for layer_index in range(N_LAYERS):
@@ -117,24 +136,14 @@ def run_permutation(seed):
             )
 
             classifier.fit(X_layer, y)
-            classifiers[layer_index] = classifier
 
-        for item_index, pt_list in test_items.items():
-            reverse = int(item_index) in reverse_indices
-            for item_name in pt_list:
-                _, image_word, condition = unpack_item(item_name)
-                X_test = ALL_HIDDEN_STATES[item_name] # (36, 4096)
-                label = get_label(condition, reverse=reverse)
-                condition = 'congruent' if label == 1 else 'incongruent'
+            X_test_layer = X_test[:, layer_index, :] # (n_test, 4096)
+            predicted_labels = classifier.predict(X_test_layer) # (n_test,)
+            passed = np.where(predicted_labels == y_test, '✅', '❌')
 
-                for layer_index, classifier in classifiers.items():
-                    X_test_layer = X_test[layer_index, :].reshape(1, -1) # (1, 4096)
-                    predicted_label = int(classifier.predict(X_test_layer)[0])
-                    predictions.append((
-                        layer_index,
-                        condition,
-                        '✅' if predicted_label == label else '❌',
-                    ))
+            predictions.extend(zip(
+                [layer_index] * len(passed), test_conditions, passed
+            ))
 
     accuracy_df = compute_layerwise_accuracy(predictions)
     accuracy_df.insert(0, "seed", seed)
@@ -155,16 +164,33 @@ def run_all_permutations(model_id, n_permutations):
             hidden_states_dir / filename, map_location="cpu", weights_only=False
         ).float().numpy()
 
+    FOLD_DATA.clear()
+    for fold in range(1, N_FOLDS + 1):
+        FOLD_DATA[fold] = {
+            "train": build_fold_data(cv_lookup[str(fold)]["train"]),
+            "test": build_fold_data(cv_lookup[str(fold)]["test"]),
+        }
+
     decoding_dir = model_dir / "decoding"
     decoding_dir.mkdir(exist_ok=True)
     PERMUTATIONS_DIR = str(decoding_dir / "permutations")
     os.makedirs(PERMUTATIONS_DIR, exist_ok=True)
 
     # A fresh pool per model: workers are forked here, after
-    # ALL_HIDDEN_STATES/PERMUTATIONS_DIR are set for this model, so they
-    # inherit them already populated.
-    with ProcessPoolExecutor(max_workers=os.cpu_count() - 2) as executor:
-        seed_accuracy_dfs = list(executor.map(run_permutation, range(n_permutations)))
+    # ALL_HIDDEN_STATES/FOLD_DATA/PERMUTATIONS_DIR are set for this model, so
+    # they inherit them already populated.
+    # submit()/as_completed() (rather than executor.map) so the progress bar
+    # advances as each seed actually finishes -- including checkpointed seeds
+    # from a prior interrupted run, which return almost immediately -- rather
+    # than sitting at 0% until every one of the n_permutations is done.
+    with ProcessPoolExecutor(max_workers=70) as executor:
+        futures = [executor.submit(run_permutation, seed) for seed in range(n_permutations)]
+        seed_accuracy_dfs = [
+            future.result()
+            for future in tqdm(
+                as_completed(futures), total=n_permutations, desc=f"Permutations for {title}"
+            )
+        ]
 
     permutation_layerwise_accuracies_df = (
         pd.concat(seed_accuracy_dfs, ignore_index=True)

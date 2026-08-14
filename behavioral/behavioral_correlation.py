@@ -150,7 +150,7 @@ def extract_correlation(model_id):
 
 def save_all_correlation():
     records = []
-    for model_id in sorted(models_lookup.keys()):
+    for model_id in models_lookup.keys():
         result = extract_correlation(model_id)
         if result is None:
             print(f"ratings.csv not found for {models_lookup[model_id]['title']}, skipping")

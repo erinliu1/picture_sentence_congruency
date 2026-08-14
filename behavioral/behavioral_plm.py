@@ -29,9 +29,9 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
 # facebook/Perception-LM-{1,3,8}B are gated on the Hub, so "local_path" (Erin's ported copies, plain
 # HF-repo-layout directories) takes priority; falls back to the Hub repo id if that directory isn't there.
 PLM_DENSE_LOOKUP = {
-    "plm_1b": {"local_path": "/Intern/Erin/Perception-LM-1B", "hf_repo_id": "facebook/Perception-LM-1B"},
-    "plm_3b": {"local_path": "/Intern/Erin/Perception-LM-3B", "hf_repo_id": "facebook/Perception-LM-3B"},
-    "plm_8b": {"local_path": "/Intern/Erin/Perception-LM-8B", "hf_repo_id": "facebook/Perception-LM-8B"},
+    "plm_1b": {"local_path": "/Intern/Erin/models/Perception-LM-1B", "hf_repo_id": "facebook/Perception-LM-1B"},
+    "plm_3b": {"local_path": "/Intern/Erin/models/Perception-LM-3B", "hf_repo_id": "facebook/Perception-LM-3B"},
+    "plm_8b": {"local_path": "/Intern/Erin/models/Perception-LM-8B", "hf_repo_id": "facebook/Perception-LM-8B"},
 }
 
 def resolve_model_name(model_id):
@@ -61,7 +61,10 @@ def extract_ratings(model_id):
         model_name = resolve_model_name(model_id)
         dtype = torch.bfloat16
         device_map = {"": 0}
-        attn_implementation = "eager"  # PLM's timm-wrapped vision tower doesn't support sdpa yet
+        # Only the timm-wrapped vision tower needs eager (no sdpa support yet); sdpa for the language
+        # model avoids materializing the huge (num_image_tokens x num_image_tokens) fp32 attention matrix
+        # that "eager" everywhere would force there, which OOMs on longer image-tile sequences.
+        attn_implementation = {"text_config": "sdpa", "vision_config": "eager"}
     else:
         return
     title = models_lookup[model_id]["title"]
@@ -88,6 +91,15 @@ def extract_ratings(model_id):
         if len(rating_ids) != 1:
             raise ValueError(f"expected a single token ID for the digit {rating!r}, but model gave {rating_ids}")
         RATING_TOKEN_IDS.append(rating_ids[0])
+
+    # PLM frequently ignores the "respond with exactly one token" instruction and starts a free-text
+    # reply (e.g. "She", "The", continuing/captioning the sentence) instead of a bare rating digit right
+    # after the chat template's generation prompt -- so most of next-token probability mass can land
+    # outside RATING_TOKEN_IDS, especially for plm_8b (median total_probability_mass ~0.002 without this).
+    # Priming the assistant turn with a literal "Rating: " before reading logits forces the model into the
+    # right format (verified: total_probability_mass on plm_8b jumps from ~0.01-0.03 to ~0.87-0.99).
+    ASSISTANT_PREFIX = "Rating: "
+    ASSISTANT_PREFIX_IDS = processor.tokenizer.encode(ASSISTANT_PREFIX, add_special_tokens=False)
 
     expected_ratings = []
     for item_index, item in enumerate(tqdm(sentences, desc=f"Extracting ratings for {title}")):
@@ -131,6 +143,12 @@ def extract_ratings(model_id):
                 add_generation_prompt=True,
                 return_dict=True,
                 return_tensors="pt",
+            )
+
+            prefix_ids = torch.tensor([ASSISTANT_PREFIX_IDS], dtype=inputs["input_ids"].dtype)
+            inputs["input_ids"] = torch.cat([inputs["input_ids"], prefix_ids], dim=1)
+            inputs["attention_mask"] = torch.cat(
+                [inputs["attention_mask"], torch.ones_like(prefix_ids)], dim=1
             )
 
             device = next(model.parameters()).device
