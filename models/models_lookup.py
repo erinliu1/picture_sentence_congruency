@@ -41,9 +41,74 @@ models_lookup = {
     },
     # 'qwen3_vl_235b_a22b_instruct': {
     #     "title": "Qwen3-VL-235B-A22B-Instruct",
-    #     "color": "#064E3B",        
+    #     "color": "#064E3B",
     #     "family": "qwen"
-    # } <-- this guy doesn't work 
+    # } <-- this guy doesn't work
+
+    'internvl3_1b_instruct': {
+        "title": "InternVL3-1B-Instruct",
+        "color": "#BFDBFE",
+        "family": "intern",
+        "type": "dense",
+        "size": "1B",
+    },
+    'internvl3_2b_instruct': {
+        "title": "InternVL3-2B-Instruct",
+        "color": "#93C5FD",
+        "family": "intern",
+        "type": "dense",
+        "size": "2B",
+    },
+    'internvl3_8b_instruct': {
+        "title": "InternVL3-8B-Instruct",
+        "color": "#60A5FA",
+        "family": "intern",
+        "type": "dense",
+        "size": "8B",
+    },
+    'internvl3_14b_instruct': {
+        "title": "InternVL3-14B-Instruct",
+        "color": "#3B82F6",
+        "family": "intern",
+        "type": "dense",
+        "size": "14B",
+    },
+    'internvl3_38b_instruct': {
+        "title": "InternVL3-38B-Instruct",
+        "color": "#2563EB",
+        "family": "intern",
+        "type": "dense",
+        "size": "38B",
+    },
+    'internvl3_78b_instruct': {
+        "title": "InternVL3-78B-Instruct",
+        "color": "#1E3A8A",
+        "family": "intern",
+        "type": "dense",
+        "size": "78B",
+    },
+
+    'plm_1b': {
+        "title": "PLM-1B",
+        "color": "#DDD6FE",
+        "family": "plm",
+        "type": "dense",
+        "size": "1B",
+    },
+    'plm_3b': {
+        "title": "PLM-3B",
+        "color": "#A78BFA",
+        "family": "plm",
+        "type": "dense",
+        "size": "3B",
+    },
+    'plm_8b': {
+        "title": "PLM-8B",
+        "color": "#6D28D9",
+        "family": "plm",
+        "type": "dense",
+        "size": "8B",
+    },
 }
 
 with open("/Intern/Erin/picture_sentence_congruency/models/models_lookup.json", "w", encoding="utf-8") as file:

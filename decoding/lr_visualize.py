@@ -118,15 +118,18 @@ def lr_visualize_all_models(family):
             color=color, 
             label=title,
         )
-    
-    ax.axhline(
-        average_significance_threshold(family),
-        linestyle="--",
-        color="black",
-        label=f"Average significance threshold ({average_significance_threshold(family):.2f})",
-        linewidth=3,
-        alpha=0.7,
-    )
+    try:
+        average_threshold = average_significance_threshold(family)
+        ax.axhline(
+            average_significance_threshold(family),
+            linestyle="--",
+            color="black",
+            label=f"Average significance threshold ({average_significance_threshold(family):.2f})",
+            linewidth=3,
+            alpha=0.7,
+        )
+    except:
+        pass
 
     ax.set_xlabel("Normalized layer", fontsize=24)
     ax.set_ylabel("Decoding accuracy", fontsize=24)

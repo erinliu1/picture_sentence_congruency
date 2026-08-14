@@ -4,3 +4,9 @@ qwen3_vl_4b_instruct,0.98125,19,36,0.8625
 qwen3_vl_8b_instruct,0.9625,18,36,0.896875
 qwen3_vl_32b_instruct,0.975,45,64,0.88125
 qwen3_vl_30b_a3b_instruct,0.978125,29,48,0.921875
+internvl3_1b_instruct,0.90625,12,24,0.7875
+internvl3_2b_instruct,0.940625,16,28,0.821875
+internvl3_8b_instruct,0.95625,16,28,0.828125
+internvl3_14b_instruct,0.978125,27,48,0.84375
+internvl3_38b_instruct,0.965625,42,64,0.809375
+internvl3_78b_instruct,0.9875,53,80,0.878125

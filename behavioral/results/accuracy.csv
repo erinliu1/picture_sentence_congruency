@@ -1,4 +1,10 @@
 source,accuracy
+internvl3_14b_instruct,0.909375
+internvl3_1b_instruct,0.51875
+internvl3_2b_instruct,0.728125
+internvl3_38b_instruct,0.95
+internvl3_78b_instruct,0.9625
+internvl3_8b_instruct,0.89375
 qwen3_vl_2b_instruct,0.884375
 qwen3_vl_30b_a3b_instruct,0.975
 qwen3_vl_32b_instruct,0.946875

@@ -1,13 +1,32 @@
-from behavioral_qwen import extract_ratings
-from behavioral_accuracy import save_all_accuracy
-from behavioral_correlation import save_all_correlation
-from behavioral_health import save_all_health
+# from behavioral_qwen import extract_ratings
+# from behavioral_intern import extract_ratings
+from behavioral_accuracy import extract_accuracy_VLM, save_all_accuracy
+from behavioral_correlation import extract_correlation, save_all_correlation
+from behavioral_health import extract_health, save_all_health
 
-dense_models = [f"qwen3_vl_{size}b_instruct" for size in [2, 4, 8, 32]]
-moe_models = ["qwen3_vl_30b_a3b_instruct"]
+import json
+from pathlib import Path
 
-# run what model you need here
-# extract_ratings("qwen3_vl_235b_a22b_instruct")
+MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
+with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
+    models_lookup = json.load(file)
+
+# model_id = "internvl3_78b_instruct"
+# extract_ratings(model_id)
+# extract_accuracy_VLM(model_id)
+# extract_correlation(model_id)
+# extract_health(model_id)
+# for model_id in models_lookup.keys():
+#     family = models_lookup[model_id]["family"]
+#     if family == "intern":
+#         try:
+#             extract_ratings(model_id)
+#             extract_accuracy_VLM(model_id)
+#             extract_correlation(model_id)
+#             extract_health(model_id)
+#         except Exception as e:
+#             print(f"Error extracting ratings for {model_id}: {e}")
+#             continue
 
 save_all_accuracy()
 save_all_correlation()

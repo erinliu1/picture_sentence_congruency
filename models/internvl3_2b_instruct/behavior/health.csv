@@ -1,0 +1,3 @@
+condition,mean_rating,std_rating,mean_top_one_token,std_top_one_token,proportion_top_one_token_1,proportion_top_one_token_2,proportion_top_one_token_3,proportion_top_one_token_4,proportion_top_one_token_5
+congruent,4.044287109375,0.3323188230186661,4.03125,0.3254773949004677,0.00625,0.0,0.0,0.94375,0.05
+incongruent,2.992041015625,0.7758295014009512,2.79375,1.4541066331699786,0.38125,0.03125,0.0,0.5875,0.0

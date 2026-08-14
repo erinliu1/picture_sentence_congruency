@@ -17,8 +17,12 @@ decoding_df = pd.read_csv(DECODING_DIR / "summary.csv")
 
 family_lookup = {
     "qwen": {
-        "color": "#d3ecb5",
+        "color": "#e0ffc2",
         "label": "Qwen3-VL",
+    },
+    "intern": {
+        "color": "#d8e9ff",
+        "label": "InternVL3",
     },
 }
 type_lookup = {"dense": "Dense", "moe": "MoE"}
@@ -36,17 +40,28 @@ plot_df["x_label"] = plot_df.apply(lambda row: f'{row["size"]}\n{type_lookup[row
 
 behavior_color = "#222222"          # black
 peak_decoding_color = "#2A9D8F"     # dark teal
-last_decoding_color = "tab:blue"     
+last_layer_decoding_color = "tab:blue"     
 correlation_color = "#B05A7A"       # muted rose
 
-fig, ax = plt.subplots(figsize=(10, 5))
+n_families = len(plot_df["family"].unique())
+fig, ax = plt.subplots(figsize=(10*n_families, 5))
 x = np.arange(len(plot_df))
 
-for family, family_df in plot_df.groupby("family", observed=True, sort=False):
+labels = False
+for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observed=True, sort=False)):
     indices = family_df.index.to_numpy()
     left = indices.min() - 0.5
     right = indices.max() + 0.5
     center = (left + right) / 2
+
+    ax.axvline(
+        left,
+        color="grey",
+        linestyle="--",
+        linewidth=2,
+        alpha=0.8,
+        zorder=2,
+    )
 
     ax.axvspan(
         indices.min() - 0.5,
@@ -67,57 +82,57 @@ for family, family_df in plot_df.groupby("family", observed=True, sort=False):
         zorder=3,
     )
 
+    ax.plot(
+        indices,
+        family_df["accuracy"],
+        marker=None,
+        color=behavior_color,
+        markersize=12,
+        linewidth=4,
+        label="Behavioral accuracy" if not labels else None,
+    )
 
-ax.plot(
-    x,
-    plot_df["accuracy"],
-    marker=None,
-    color=behavior_color,
-    markersize=12,
-    linewidth=4,
-    label="Behavioral accuracy",
-)
+    ax.plot(
+        indices,
+        family_df["peak_decoding_accuracy"],
+        marker=None,
+        color=peak_decoding_color,
+        markersize=12,
+        linewidth=4,
+        linestyle="--",
+        label="Peak decoding accuracy" if not labels else None,
+    )
 
-ax.plot(
-    x,
-    plot_df["peak_decoding_accuracy"],
-    marker=None,
-    color=peak_decoding_color,
-    markersize=12,
-    linewidth=4,
-    linestyle="--",
-    label="Peak decoding accuracy",
-)
+    ax.plot(
+        indices,
+        family_df["last_layer_decoding_accuracy"],
+        marker=None,
+        color=last_layer_decoding_color,
+        markersize=12,
+        linewidth=4,
+        linestyle="--",
+        label="Last layer decoding accuracy" if not labels else None,
+    )
 
-ax.plot(
-    x,
-    plot_df["last_layer_decoding_accuracy"],
-    marker=None,
-    color=last_decoding_color,
-    markersize=12,
-    linewidth=4,
-    linestyle="--",
-    label="Last layer decoding accuracy",
-)
+    ax.plot(
+        indices,
+        family_df["spearman_rho"],
+        marker=None,
+        markersize=12,
+        linewidth=4,
+        color=correlation_color,
+        linestyle=":",
+        label="Human–VLM behavioral correlation" if not labels else None,
+    )
 
-ax.plot(
-    x,
-    plot_df["spearman_rho"],
-    marker=None,
-    markersize=12,
-    linewidth=4,
-    color=correlation_color,
-    linestyle=":",
-    label="Human–VLM behavioral correlation",
-)
-
-ax.fill_between(
-    x,
-    plot_df["ci_lower"],
-    plot_df["ci_upper"],
-    color=correlation_color,
-    alpha=0.2,
-)
+    ax.fill_between(
+        indices,
+        family_df["ci_lower"],
+        family_df["ci_upper"],
+        color=correlation_color,
+        alpha=0.2,
+    )
+    labels = True
 
 ax.set_xticks(x)
 ax.set_xticklabels(plot_df["x_label"], fontsize=22)

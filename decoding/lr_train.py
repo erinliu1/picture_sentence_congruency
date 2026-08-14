@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import torch
 
+from tqdm import tqdm
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -83,9 +84,9 @@ def lr_train(model_id, reverse_indices=[]):
         print(f"Decoding results already exist for {model_id}, skipping training.")
         return
 
+    title = models_lookup[model_id]["title"]
     results = []
-
-    for fold in range(1, N_FOLDS + 1):
+    for fold in tqdm(range(1, N_FOLDS + 1), desc=f"Decoding for {title}"):
         train_items = CV_LOOKUP[str(fold)]["train"]
         test_items = CV_LOOKUP[str(fold)]["test"]
 
