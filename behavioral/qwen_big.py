@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from prepare_cuda import prepare_cuda
-prepare_cuda(allow_multi_gpu=False)
+prepare_cuda(allow_multi_gpu=True)
 
 import json
 import torch
 from PIL import Image
-from transformers import AutoProcessor, Qwen3VLForConditionalGeneration, Qwen3VLMoeForConditionalGeneration
+from transformers import AutoProcessor, Qwen3VLMoeForConditionalGeneration
 
 import torch.nn.functional as F
 import pandas as pd
@@ -25,20 +25,14 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-# All Qwen checkpoints tokenize rating digits "1"-"5" as single tokens.
-QWEN_DENSE_LOOKUP = {
-    "qwen3_vl_2b_instruct": "Qwen/Qwen3-VL-2B-Instruct",
-    "qwen3_vl_4b_instruct": "Qwen/Qwen3-VL-4B-Instruct",
-    "qwen3_vl_8b_instruct": "Qwen/Qwen3-VL-8B-Instruct",
-    "qwen3_vl_32b_instruct": "Qwen/Qwen3-VL-32B-Instruct",
+models = {
+    "qwen3_vl_235b_a22b_instruct": {
+        "class": Qwen3VLMoeForConditionalGeneration,
+        "name": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+        "title": "Qwen3-VL-235B-A22B-Instruct",
+        "family": "qwen"
+    },
 }
-
-QWEN_MOE_LOOKUP = {
-    "qwen3_vl_30b_a3b_instruct": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # broken; needs multiple GPUs
-}
-
-MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} # can fit on one GPU
 
 SYSTEM_PROMPT = """
 You will be shown one picture and one sentence. Your task is to judge how compatible the final word of the sentence is with the situation shown in the picture.
@@ -57,36 +51,21 @@ Use the following rating scale:
 Respond with exactly one token: 1, 2, 3, 4, or 5. Do not output any additional text.
 """.strip()
 
-def extract_ratings(model_id):
-    if model_id in QWEN_DENSE_LOOKUP:
-        model_class = Qwen3VLForConditionalGeneration
-        model_name = QWEN_DENSE_LOOKUP[model_id]
-        dtype = torch.bfloat16
-        device_map = {"": 0}
-    elif model_id in QWEN_MOE_LOOKUP:
-        model_class = Qwen3VLMoeForConditionalGeneration
-        model_name = QWEN_MOE_LOOKUP[model_id]
-        if model_id in MOE_SINGLE_GPU_MODELS:
-            dtype = torch.bfloat16
-            device_map = {"": 0}
-        else:
-            dtype = "auto" 
-            device_map = "auto" # <-- broken; the model outputs are messed up when using multiple GPUs rn
-    else:
-        return
-    title = models_lookup[model_id]["title"]
-
-    BEHAVIOR_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/behavior")
-    BEHAVIOR_DIR.mkdir(parents=True, exist_ok=True)
-
-    model = model_class.from_pretrained(
-        model_name,
-        dtype=dtype,
-        device_map=device_map,
+def extract_ratings_qwen(model_id):
+    title = models[model_id]["title"]
+    print(f'Loading {title}:')
+    model = models[model_id]["class"].from_pretrained(
+        models[model_id]["name"],
+        dtype="auto",
+        device_map="auto",
         attn_implementation="sdpa"
     )
     model.eval()
-    processor = AutoProcessor.from_pretrained(model_name)
+    processor = AutoProcessor.from_pretrained(models[model_id]["name"])
+    print(f'✅ Loaded model {title}')
+
+    BEHAVIOR_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/behavior")
+    BEHAVIOR_DIR.mkdir(parents=True, exist_ok=True)
 
     RATING_TOKEN_IDS = []
     for rating in range(1, 6):
@@ -170,12 +149,14 @@ def extract_ratings(model_id):
                 "p4": probabilities[3].item(),
                 "p5": probabilities[4].item(),
                 "total_probability_mass": total_probability_mass,
+                "flag": '⚠️' if total_probability_mass < 0.9 else '✅',
             })
 
     df = pd.DataFrame(expected_ratings)
     df = df.sort_values(by=['item_index', 'condition', 'image_word']).reset_index(drop=True)
     df.to_csv(BEHAVIOR_DIR / "ratings.csv", index=False)
     
-    print(f"Ratings for {model_id} saved.")
     del model
     torch.cuda.empty_cache()
+
+extract_ratings_qwen("qwen3_vl_235b_a22b_instruct")

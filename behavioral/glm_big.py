@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from prepare_cuda import prepare_cuda
-prepare_cuda(allow_multi_gpu=False)
+prepare_cuda(allow_multi_gpu=True)
 
 import json
 import torch
 from PIL import Image
-from transformers import AutoProcessor, Qwen3VLForConditionalGeneration, Qwen3VLMoeForConditionalGeneration
+from transformers import AutoProcessor, Glm4vMoeForConditionalGeneration
 
 import torch.nn.functional as F
 import pandas as pd
@@ -25,20 +25,14 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-# All Qwen checkpoints tokenize rating digits "1"-"5" as single tokens.
-QWEN_DENSE_LOOKUP = {
-    "qwen3_vl_2b_instruct": "Qwen/Qwen3-VL-2B-Instruct",
-    "qwen3_vl_4b_instruct": "Qwen/Qwen3-VL-4B-Instruct",
-    "qwen3_vl_8b_instruct": "Qwen/Qwen3-VL-8B-Instruct",
-    "qwen3_vl_32b_instruct": "Qwen/Qwen3-VL-32B-Instruct",
+models = {
+    "glm_106b_a12b": {
+        "class": Glm4vMoeForConditionalGeneration,
+        "name": "zai-org/GLM-4.6V",
+        "title": "GLM-4.6V-106B-A12B",
+        "family": "glm"
+    }
 }
-
-QWEN_MOE_LOOKUP = {
-    "qwen3_vl_30b_a3b_instruct": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # broken; needs multiple GPUs
-}
-
-MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} # can fit on one GPU
 
 SYSTEM_PROMPT = """
 You will be shown one picture and one sentence. Your task is to judge how compatible the final word of the sentence is with the situation shown in the picture.
@@ -57,36 +51,21 @@ Use the following rating scale:
 Respond with exactly one token: 1, 2, 3, 4, or 5. Do not output any additional text.
 """.strip()
 
-def extract_ratings(model_id):
-    if model_id in QWEN_DENSE_LOOKUP:
-        model_class = Qwen3VLForConditionalGeneration
-        model_name = QWEN_DENSE_LOOKUP[model_id]
-        dtype = torch.bfloat16
-        device_map = {"": 0}
-    elif model_id in QWEN_MOE_LOOKUP:
-        model_class = Qwen3VLMoeForConditionalGeneration
-        model_name = QWEN_MOE_LOOKUP[model_id]
-        if model_id in MOE_SINGLE_GPU_MODELS:
-            dtype = torch.bfloat16
-            device_map = {"": 0}
-        else:
-            dtype = "auto" 
-            device_map = "auto" # <-- broken; the model outputs are messed up when using multiple GPUs rn
-    else:
-        return
-    title = models_lookup[model_id]["title"]
-
-    BEHAVIOR_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/behavior")
-    BEHAVIOR_DIR.mkdir(parents=True, exist_ok=True)
-
-    model = model_class.from_pretrained(
-        model_name,
-        dtype=dtype,
-        device_map=device_map,
+def extract_ratings_glm(model_id):
+    title = models[model_id]["title"]
+    print(f'Loading {title}:')
+    model = models[model_id]["class"].from_pretrained(
+        models[model_id]["name"],
+        dtype="auto",
+        device_map="auto",
         attn_implementation="sdpa"
     )
     model.eval()
-    processor = AutoProcessor.from_pretrained(model_name)
+    processor = AutoProcessor.from_pretrained(models[model_id]["name"])
+    print(f'✅ Loaded model {title}')
+
+    BEHAVIOR_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/behavior")
+    BEHAVIOR_DIR.mkdir(parents=True, exist_ok=True)
 
     RATING_TOKEN_IDS = []
     for rating in range(1, 6):
@@ -94,7 +73,9 @@ def extract_ratings(model_id):
         if len(rating_ids) != 1:
             raise ValueError(f"expected a single token ID for the digit {rating!r}, but model gave {rating_ids}")
         RATING_TOKEN_IDS.append(rating_ids[0])
-    
+
+    box_token_id = processor.tokenizer.convert_tokens_to_ids("<|begin_of_box|>")
+
     expected_ratings = []
     for item_index, item in enumerate(tqdm(sentences, desc=f"Extracting ratings for {title}")):
         sentence_frame = item['sentence_frame']
@@ -109,7 +90,7 @@ def extract_ratings(model_id):
             sentence = f"{sentence_frame} {final_word}."
             image_path = PICTURES_DIR / f"{image_word}.png"
             image = Image.open(image_path).convert("RGB")
-
+            
             messages = [
                 {
                     "role": "system",
@@ -133,30 +114,52 @@ def extract_ratings(model_id):
                         },
                     ],
                 },
-            ]
+            ]            
+            
             inputs = processor.apply_chat_template(
                 messages,
                 tokenize=True,
                 add_generation_prompt=True,
                 return_dict=True,
                 return_tensors="pt",
-            )
+                enable_thinking=False,
+            ).to(model.device)
 
-            device = next(model.parameters()).device
-            inputs = {k: v.to(device) for k, v in inputs.items()}
+            prompt_len = inputs["input_ids"].shape[-1]
+
+            def prefix_allowed_tokens_fn(batch_id, input_ids):
+                generated_len = input_ids.shape[-1] - prompt_len
+
+                if generated_len == 0:
+                    # First generated token
+                    return [box_token_id]
+
+                # Second generated token
+                return RATING_TOKEN_IDS
 
             with torch.inference_mode():
-                outputs = model(**inputs, use_cache=False)
+                generated = model.generate(
+                    **inputs,
+                    max_new_tokens=2,
+                    do_sample=False,
+                    return_dict_in_generate=True,
+                    output_scores=True,
+                    output_logits=True,
+                    prefix_allowed_tokens_fn=prefix_allowed_tokens_fn,
+                )
 
-            next_token_logits = outputs.logits[0, -1]
-            rating_logits = next_token_logits[RATING_TOKEN_IDS]
+            # Raw model logits at the position AFTER <|begin_of_box|>
+            second_token_logits = generated.logits[1][0]
+
+            rating_logits = second_token_logits[RATING_TOKEN_IDS]
             probabilities = F.softmax(rating_logits, dim=0)
             ratings = torch.arange(1, 6, device=probabilities.device, dtype=probabilities.dtype)
             expected_rating = (probabilities * ratings).sum().item()
             max_probability = probabilities.max().item()
             top_one_token = int(ratings[probabilities.argmax()].item())
-            full_probabilities = F.softmax(next_token_logits, dim=0)
+            full_probabilities = F.softmax(second_token_logits, dim=0)
             total_probability_mass = full_probabilities[RATING_TOKEN_IDS].sum().item()
+
             expected_ratings.append({
                 "item_index": item_index,
                 "image_word": image_word,
@@ -170,12 +173,14 @@ def extract_ratings(model_id):
                 "p4": probabilities[3].item(),
                 "p5": probabilities[4].item(),
                 "total_probability_mass": total_probability_mass,
+                "flag": '⚠️' if total_probability_mass < 0.9 else '✅',
             })
 
     df = pd.DataFrame(expected_ratings)
     df = df.sort_values(by=['item_index', 'condition', 'image_word']).reset_index(drop=True)
     df.to_csv(BEHAVIOR_DIR / "ratings.csv", index=False)
-    
-    print(f"Ratings for {model_id} saved.")
+
     del model
     torch.cuda.empty_cache()
+
+extract_ratings_glm("glm_106b_a12b")

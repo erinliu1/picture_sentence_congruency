@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from prepare_cuda import prepare_cuda
-prepare_cuda(allow_multi_gpu=False)
+prepare_cuda(allow_multi_gpu=True)
 
 from PIL import Image
 from tqdm import tqdm
@@ -52,7 +52,7 @@ QWEN_DENSE_LOOKUP = {
 
 QWEN_MOE_LOOKUP = {
     "qwen3_vl_30b_a3b_instruct": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # broken
+    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # run this
 }
 
 MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} 
@@ -154,3 +154,5 @@ def extract_hidden_states(model_id):
     print(f"Hidden states for {model_id} saved.")
     del model
     torch.cuda.empty_cache()
+
+extract_hidden_states("qwen3_vl_235b_a22b_instruct")

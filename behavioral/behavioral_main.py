@@ -4,7 +4,8 @@
 # from behavioral_llava import extract_ratings
 # from behavioral_glm import extract_ratings
 # from behavioral_gemma3 import extract_ratings
-from behavioral_gemma4 import extract_ratings
+# from behavioral_gemma4 import extract_ratings
+
 from behavioral_accuracy import extract_accuracy_VLM, save_all_accuracy
 from behavioral_correlation import extract_correlation, save_all_correlation
 from behavioral_health import extract_health, save_all_health

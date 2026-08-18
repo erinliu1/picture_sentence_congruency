@@ -1,8 +1,6 @@
 # For every stimulus, feed to each GLM-4.6V model, pull out the model's internal hidden states at the last word of the sentence, for every layer.
 # Saves a .pt file per stimulus, naming convention as {item_index}_{image_word}_{condition}.pt
 # item_index is the order of the stimulus in the sentences.json
-#
-# GLM-4.6V's 106B-A12B MoE checkpoint (~212GB in bf16) doesn't fit on a single GB200's ~190GB HBM; not done yet
 
 from __future__ import annotations
 
@@ -21,7 +19,7 @@ load_dotenv()
 
 
 from prepare_cuda import prepare_cuda
-prepare_cuda(allow_multi_gpu=False)
+prepare_cuda(allow_multi_gpu=True)
 
 from PIL import Image
 from tqdm import tqdm
@@ -52,7 +50,7 @@ GLM_DENSE_LOOKUP = {
     "glm_9b": "zai-org/GLM-4.6V-Flash",
 }
 GLM_MOE_LOOKUP = {
-    "glm_106b_a12b": "zai-org/GLM-4.6V", # broken
+    "glm_106b_a12b": "zai-org/GLM-4.6V", # run this
 }
 
 def extract_hidden_states(model_id):
@@ -146,3 +144,5 @@ def extract_hidden_states(model_id):
     print(f"Hidden states for {model_id} saved.")
     del model
     torch.cuda.empty_cache()
+
+extract_hidden_states("glm_106b_a12b")

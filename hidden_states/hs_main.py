@@ -1,4 +1,3 @@
-# from hs_gemma3 import extract_hidden_states
 from hs_gemma4 import extract_hidden_states
 
 import json

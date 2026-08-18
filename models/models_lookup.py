@@ -5,45 +5,46 @@ import json
 models_lookup = {
     'qwen3_vl_2b_instruct': {
         "title": "Qwen3-VL-2B-Instruct",
-        "color": "#BEF264",
+        "color": "#D9F99D",
         "family": "qwen",
         "type": "dense",
         "size": "2B",
     },
     'qwen3_vl_4b_instruct': {
         "title": "Qwen3-VL-4B-Instruct",
-        "color": "#84CC16",
+        "color": "#A3E635",
         "family": "qwen",
         "type": "dense",
         "size": "4B",
     },
     'qwen3_vl_8b_instruct': {
         "title": "Qwen3-VL-8B-Instruct",
-        "color": "#4D7C0F",
+        "color": "#65A30D",
         "family": "qwen",
         "type": "dense",
         "size": "8B",
     },
     'qwen3_vl_32b_instruct': {
         "title": "Qwen3-VL-32B-Instruct",
-        "color": "#15803D",
+        "color": "#4D7C0F",
         "family": "qwen",
         "type": "dense",
         "size": "32B",
     },
     'qwen3_vl_30b_a3b_instruct': {
         "title": "Qwen3-VL-30B-A3B-Instruct",
-        "color": "#14532D",
+        "color": "#3F6212",
         "family": "qwen",
         "type": "moe",
-        "size": "30B-A4B",
-    },   
-    # 'qwen3_vl_235b_a22b_instruct': {
-    #     "title": "Qwen3-VL-235B-A22B-Instruct",
-    #     "color": "#064E3B",
-    #     "family": "qwen"
-    # } <-- this guy doesn't work
-
+        "size": "30B-A3B",
+    },
+    'qwen3_vl_235b_a22b_instruct': {
+        "title": "Qwen3-VL-235B-A22B-Instruct",
+        "color": "#365314",
+        "family": "qwen",
+        "type": "moe",
+        "size": "235B-A22B",
+    },
     'internvl3_1b_instruct': {
         "title": "InternVL3-1B-Instruct",
         "color": "#BFDBFE",
@@ -136,14 +137,13 @@ models_lookup = {
         "type": "dense",
         "size": "9B",
     },
-    # 'glm_106b_a12b': {
-    #     "title": "GLM-4.6V-106B-A12B",
-    #     "color": "#0E7490",
-    #     "family": "glm",
-    #     "type": "moe",
-    #     "size": "106-A12B",
-    # }, <-- this guy doesn't work
-
+    'glm_106b_a12b': {
+        "title": "GLM-4.6V-106B-A12B",
+        "color": "#0E7490",
+        "family": "glm",
+        "type": "moe",
+        "size": "106-A12B",
+    },
     'gemma3_4b': {
         "title": "Gemma3-4B",
         "color": "#FDE68A",

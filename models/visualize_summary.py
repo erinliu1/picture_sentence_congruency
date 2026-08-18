@@ -45,7 +45,7 @@ family_lookup = {
         "label": "Gemma4",
     },
 }
-type_lookup = {"dense": "Dense", "moe": "MoE", "PLE": "Dense (PLE)"}
+type_lookup = {"PLE": "Dense\n(PLE)", "dense": "Dense", "moe": "MoE"}
 
 plot_df = accuracy_df.merge(correlation_df, on="source").merge(decoding_df, on="source")
 plot_df["title"] = plot_df["source"].map(lambda x: models_lookup[x]["title"])
@@ -68,31 +68,29 @@ fig, ax = plt.subplots(figsize=(6*n_families, 5))
 x = np.arange(len(plot_df))
 
 labels = False
-for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observed=True, sort=False)):
-    indices = family_df.index.to_numpy()
-    left = indices.min() - 0.5
-    right = indices.max() + 0.5
-    center = (left + right) / 2
+offset = 0.07
 
-    ax.axvline(
-        left,
-        color="grey",
-        linestyle="--",
-        linewidth=2,
-        alpha=0.8,
-        zorder=2,
-    )
+for family_i, (family, family_df) in enumerate(
+    plot_df.groupby("family", observed=True, sort=False)
+):
+    family_indices = family_df.index.to_numpy()
 
+    family_left = family_indices.min() - 0.5
+    family_right = family_indices.max() + 0.5
+    family_center = (family_left + family_right) / 2
+
+    # Family background shading
     ax.axvspan(
-        indices.min() - 0.5,
-        indices.max() + 0.5,
+        family_left,
+        family_right,
         color=family_lookup[family]["color"],
         alpha=0.5,
         zorder=0,
     )
 
+    # Family label
     ax.text(
-        center,
+        family_center,
         1.1,
         family_lookup[family]["label"],
         ha="center",
@@ -102,57 +100,126 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
         zorder=3,
     )
 
-    ax.plot(
-        indices,
-        family_df["accuracy"],
-        marker=None if len(family_df) > 1 else "o",
-        color=behavior_color,
-        markersize=12,
-        linewidth=4,
-        label="Behavioral accuracy" if not labels else None,
-    )
+    # Plot each type separately so lines do not cross type boundaries
+    for model_type, type_df in family_df.groupby(
+        "type",
+        observed=True,
+        sort=False,
+    ):
+        indices = type_df.index.to_numpy()
 
-    ax.plot(
-        indices,
-        family_df["peak_decoding_accuracy"],
-        marker=None if len(family_df) > 1 else "o",
-        color=peak_decoding_color,
-        markersize=12,
-        linewidth=4,
-        linestyle="--",
-        label="Peak decoding accuracy" if not labels else None,
-    )
+        # Separator at start of each type block
+        ax.axvline(
+            indices.min() - 0.5,
+            color="grey",
+            linestyle="--",
+            linewidth=2,
+            alpha=0.8,
+            zorder=2,
+        )
 
-    ax.plot(
-        indices,
-        family_df["last_layer_decoding_accuracy"],
-        marker=None if len(family_df) > 1 else "o",
-        color=last_layer_decoding_color,
-        markersize=12,
-        linewidth=4,
-        linestyle="--",
-        label="Last layer decoding accuracy" if not labels else None,
-    )
+        # -------------------------
+        # CENTERED CONNECTING LINES
+        # -------------------------
 
-    ax.plot(
-        indices,
-        family_df["spearman_rho"],
-        marker=None if len(family_df) > 1 else "o",
-        markersize=12,
-        linewidth=4,
-        color=correlation_color,
-        linestyle=":",
-        label="Human–VLM behavioral correlation" if not labels else None,
-    )
+        ax.plot(
+            indices,
+            type_df["accuracy"],
+            color=behavior_color,
+            linewidth=4,
+            label="Behavioral accuracy" if not labels else None,
+            zorder=3,
+        )
 
-    ax.fill_between(
-        indices,
-        family_df["ci_lower"],
-        family_df["ci_upper"],
-        color=correlation_color,
-        alpha=0.2,
-    )
-    labels = True
+        ax.plot(
+            indices,
+            type_df["peak_decoding_accuracy"],
+            color=peak_decoding_color,
+            linewidth=4,
+            linestyle="--",
+            label="Peak decoding accuracy" if not labels else None,
+            zorder=3,
+        )
+
+        ax.plot(
+            indices,
+            type_df["last_layer_decoding_accuracy"],
+            color=last_layer_decoding_color,
+            linewidth=4,
+            linestyle="--",
+            label="Last layer decoding accuracy" if not labels else None,
+            zorder=3,
+        )
+
+        ax.plot(
+            indices,
+            type_df["spearman_rho"],
+            color=correlation_color,
+            linewidth=4,
+            linestyle=":",
+            label="Human–VLM behavioral correlation" if not labels else None,
+            zorder=3,
+        )
+
+        # -------------------------
+        # OFFSET MARKERS ONLY
+        # -------------------------
+
+        if len(indices) == 1:
+            
+            ax.scatter(
+                indices - 1.5 * offset,
+                type_df["accuracy"],
+                color=behavior_color,
+                s=100,
+                zorder=5,
+            )
+
+            ax.scatter(
+                indices - 0.5 * offset,
+                type_df["peak_decoding_accuracy"],
+                color=peak_decoding_color,
+                s=100,
+                zorder=5,
+            )
+
+            ax.scatter(
+                indices + 0.5 * offset,
+                type_df["last_layer_decoding_accuracy"],
+                color=last_layer_decoding_color,
+                s=100,
+                zorder=5,
+            )
+
+            ax.scatter(
+                indices + 1.5 * offset,
+                type_df["spearman_rho"],
+                color=correlation_color,
+                s=100,
+                zorder=5,
+            )
+
+        # Correlation CI remains centered on true model position
+        ax.fill_between(
+            indices,
+            type_df["ci_lower"],
+            type_df["ci_upper"],
+            color=correlation_color,
+            alpha=0.2,
+            zorder=1,
+        )
+
+        labels = True
+
+# Final separator after last model
+ax.axvline(
+    len(plot_df) - 0.5,
+    color="grey",
+    linestyle="--",
+    linewidth=2,
+    alpha=0.8,
+    zorder=2,
+)
 
 ax.set_xticks(x)
 ax.set_xticklabels(plot_df["x_label"], fontsize=22)
