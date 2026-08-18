@@ -26,7 +26,7 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
 # All PLM checkpoints are dense, run on a single GPU, and tokenize rating digits "1"-"5" as single tokens.
-# facebook/Perception-LM-{1,3,8}B are gated on the Hub, so "local_path" (Erin's ported copies, plain
+# facebook/Perception-LM-{1,3,8}B are gated on the Hub, so "local_path" (Kenny's ported copies, plain
 # HF-repo-layout directories) takes priority; falls back to the Hub repo id if that directory isn't there.
 PLM_DENSE_LOOKUP = {
     "plm_1b": {"local_path": "/Intern/Erin/models/Perception-LM-1B", "hf_repo_id": "facebook/Perception-LM-1B"},

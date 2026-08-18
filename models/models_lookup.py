@@ -5,7 +5,7 @@ import json
 models_lookup = {
     'qwen3_vl_2b_instruct': {
         "title": "Qwen3-VL-2B-Instruct",
-        "color": "#A3E635",
+        "color": "#BEF264",
         "family": "qwen",
         "type": "dense",
         "size": "2B",
@@ -16,29 +16,28 @@ models_lookup = {
         "family": "qwen",
         "type": "dense",
         "size": "4B",
-
     },
     'qwen3_vl_8b_instruct': {
         "title": "Qwen3-VL-8B-Instruct",
-        "color": "#65A30D",
+        "color": "#4D7C0F",
         "family": "qwen",
         "type": "dense",
         "size": "8B",
     },
     'qwen3_vl_32b_instruct': {
         "title": "Qwen3-VL-32B-Instruct",
-        "color": "#16A34A",
+        "color": "#15803D",
         "family": "qwen",
         "type": "dense",
         "size": "32B",
     },
     'qwen3_vl_30b_a3b_instruct': {
         "title": "Qwen3-VL-30B-A3B-Instruct",
-        "color": "#047857",
+        "color": "#14532D",
         "family": "qwen",
         "type": "moe",
-        "size": "30-A4B",
-    },
+        "size": "30B-A4B",
+    },   
     # 'qwen3_vl_235b_a22b_instruct': {
     #     "title": "Qwen3-VL-235B-A22B-Instruct",
     #     "color": "#064E3B",
@@ -108,6 +107,63 @@ models_lookup = {
         "family": "plm",
         "type": "dense",
         "size": "8B",
+    },
+    'llava_ov_05b': {
+        "title": "LLaVA-OV-0.5B",
+        "color": "#FBCFE8",
+        "family": "llava",
+        "type": "dense",
+        "size": "0.5B",
+        },
+    'llava_ov_7b': {
+        "title": "LLaVA-OV-7B",
+        "color": "#F472B6",
+        "family": "llava",
+        "type": "dense",
+        "size": "7B",
+    },
+    'llava_ov_72b': {
+        "title": "LLaVA-OV-72B",
+        "color": "#BE185D",
+        "family": "llava",
+        "type": "dense",
+        "size": "72B",
+    },
+    'glm_9b': {
+        "title": "GLM-4.6V-9B",
+        "color": "#67E8F9",
+        "family": "glm",
+        "type": "dense",
+        "size": "9B",
+    },
+    # 'glm_106b_a12b': {
+    #     "title": "GLM-4.6V-106B-A12B",
+    #     "color": "#0E7490",
+    #     "family": "glm",
+    #     "type": "moe",
+    #     "size": "106-A12B",
+    # }, <-- this guy doesn't work
+
+    'gemma3_4b': {
+        "title": "Gemma-3-4B",
+        "color": "#FDE68A",
+        "family": "gemma3",
+        "type": "dense",
+        "size": "4B",
+    },
+    'gemma3_12b': {
+        "title": "Gemma-3-12B",
+        "color": "#F59E0B",
+        "family": "gemma3",
+        "type": "dense",
+        "size": "12B",
+    },
+    'gemma3_27b': {
+        "title": "Gemma-3-27B",
+        "color": "#B45309",
+        "family": "gemma3",
+        "type": "dense",
+        "size": "27B",
     },
 }
 

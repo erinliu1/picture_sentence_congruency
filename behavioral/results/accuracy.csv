@@ -13,4 +13,8 @@ internvl3_78b_instruct,0.9625
 plm_1b,0.646875
 plm_3b,0.809375
 plm_8b,0.746875
+llava_ov_05b,0.571875
+llava_ov_7b,0.83125
+llava_ov_72b,0.940625
+glm_9b,0.91875
 human,0.9875

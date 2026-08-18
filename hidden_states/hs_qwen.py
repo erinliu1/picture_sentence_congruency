@@ -52,10 +52,10 @@ QWEN_DENSE_LOOKUP = {
 
 QWEN_MOE_LOOKUP = {
     "qwen3_vl_30b_a3b_instruct": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8", # using the FP8 version because the bf16 version has garbled outputs when using device_map="auto"
+    "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # broken
 }
 
-MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} # garbled outputs when using device_map="auto" for the 30B model, so restrict to a single GPU
+MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} 
 
 def extract_hidden_states(model_id):
     if model_id in QWEN_DENSE_LOOKUP:

@@ -34,10 +34,10 @@ QWEN_DENSE_LOOKUP = {
 
 QWEN_MOE_LOOKUP = {
     "qwen3_vl_30b_a3b_instruct": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-    # "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8", # this model is unusable; when we use device_map="auto" and the model is loaded onto multiple GPUs. some outputs are garbled, e.g. "Picture\n ...\n . The >\r" ??? all other models use one GPU so this issue doesn't arise. this guy does not fit on a single gpu so i'm giving up on it
+    # "qwen3_vl_235b_a22b_instruct": "Qwen/Qwen3-VL-235B-A22B-Instruct", # broken; needs multiple GPUs
 }
 
-MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} # garbled outputs when using device_map="auto" for the 30B model; putting it on a single GPU works 
+MOE_SINGLE_GPU_MODELS = {"qwen3_vl_30b_a3b_instruct"} # can fit on one GPU
 
 SYSTEM_PROMPT = """
 You will be shown one picture and one sentence. Your task is to judge how compatible the final word of the sentence is with the situation shown in the picture.
@@ -70,7 +70,7 @@ def extract_ratings(model_id):
             device_map = {"": 0}
         else:
             dtype = "auto" 
-            device_map = "auto" # <-- don't use this; the model outputs are messed up when using multiple GPUs
+            device_map = "auto" # <-- broken; the model outputs are messed up when using multiple GPUs rn
     else:
         return
     title = models_lookup[model_id]["title"]

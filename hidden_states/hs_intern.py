@@ -141,6 +141,3 @@ def extract_hidden_states(model_id):
     print(f"Hidden states for {model_id} saved.")
     del model
     torch.cuda.empty_cache()
-
-for model_id in INTERNVL_DENSE_LOOKUP.keys():
-    extract_hidden_states(model_id)

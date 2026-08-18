@@ -24,8 +24,16 @@ family_lookup = {
         "color": "#d8e9ff",
         "label": "InternVL3",
     },
+    "plm": {
+        "color": "#f9e0ff",
+        "label": "Perception-LM",
+    },
+    "llava": {
+        "color": "#ffeff7",
+        "label": "LLaVA-OneVision",
+    },
 }
-type_lookup = {"dense": "Dense", "moe": "MoE"}
+type_lookup = {"dense": "Dense", "moe": "MoE", }
 
 plot_df = accuracy_df.merge(correlation_df, on="source").merge(decoding_df, on="source")
 plot_df["title"] = plot_df["source"].map(lambda x: models_lookup[x]["title"])
@@ -44,7 +52,7 @@ last_layer_decoding_color = "tab:blue"
 correlation_color = "#B05A7A"       # muted rose
 
 n_families = len(plot_df["family"].unique())
-fig, ax = plt.subplots(figsize=(10*n_families, 5))
+fig, ax = plt.subplots(figsize=(6*n_families, 5))
 x = np.arange(len(plot_df))
 
 labels = False
@@ -73,7 +81,7 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
 
     ax.text(
         center,
-        0.6,
+        1.1,
         family_lookup[family]["label"],
         ha="center",
         va="top",
@@ -138,12 +146,13 @@ ax.set_xticks(x)
 ax.set_xticklabels(plot_df["x_label"], fontsize=22)
 
 ax.set_ylabel("Performance", fontsize=22)
-ax.set_ylim(0.45, 1)
+ax.set_ylim(0.1, 1.05)
+ax.set_yticks(np.arange(0.2, 1.05, 0.2))
 ax.tick_params(axis="both", labelsize=22, width=2, length=8)
 for spine in ax.spines.values():
     spine.set_linewidth(2)
 
-ax.legend(fontsize=17.5, loc="lower right", framealpha=0.9)
+ax.legend(fontsize=17.5, loc="best", framealpha=0.9)
 plt.grid(True, linewidth=2, alpha=0.3)
 plt.tight_layout()
 
