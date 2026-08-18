@@ -13,7 +13,10 @@ def lr_summarize():
     summary_data = []
     for model_id in models_lookup.keys():
         results_dir = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/decoding")
-        main_accuracy_df = pd.read_csv(results_dir / "layerwise_accuracy.csv")
+        try:
+            main_accuracy_df = pd.read_csv(results_dir / "layerwise_accuracy.csv")
+        except:
+            continue
         peak_accuracy = main_accuracy_df["all_accuracy"].max()
         peak_layer_index = main_accuracy_df["all_accuracy"].idxmax()
         last_layer_accuracy = main_accuracy_df["all_accuracy"].iloc[-1]

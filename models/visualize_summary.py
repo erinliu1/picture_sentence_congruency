@@ -17,23 +17,35 @@ decoding_df = pd.read_csv(DECODING_DIR / "summary.csv")
 
 family_lookup = {
     "qwen": {
-        "color": "#e0ffc2",
+        "color": "#F0FDCB",   # light lime green
         "label": "Qwen3-VL",
     },
     "intern": {
-        "color": "#d8e9ff",
+        "color": "#E8F2FF",   # light blue
         "label": "InternVL3",
     },
     "plm": {
-        "color": "#f9e0ff",
+        "color": "#F3EEFF",   # light purple
         "label": "Perception-LM",
     },
     "llava": {
-        "color": "#ffeff7",
+        "color": "#FDEBF4",   # light pink
         "label": "LLaVA-OneVision",
     },
+    "glm": {
+        "color": "#E5FAFD",   # light cyan
+        "label": "GLM-4.6V",
+    },
+    "gemma3": {
+        "color": "#FFF5D6",   # light yellow/gold
+        "label": "Gemma3",
+    },
+    "gemma4": {
+        "color": "#FFF0E3",   # light orange
+        "label": "Gemma4",
+    },
 }
-type_lookup = {"dense": "Dense", "moe": "MoE", }
+type_lookup = {"dense": "Dense", "moe": "MoE", "PLE": "Dense (PLE)"}
 
 plot_df = accuracy_df.merge(correlation_df, on="source").merge(decoding_df, on="source")
 plot_df["title"] = plot_df["source"].map(lambda x: models_lookup[x]["title"])
@@ -93,7 +105,7 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
     ax.plot(
         indices,
         family_df["accuracy"],
-        marker=None,
+        marker=None if len(family_df) > 1 else "o",
         color=behavior_color,
         markersize=12,
         linewidth=4,
@@ -103,7 +115,7 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
     ax.plot(
         indices,
         family_df["peak_decoding_accuracy"],
-        marker=None,
+        marker=None if len(family_df) > 1 else "o",
         color=peak_decoding_color,
         markersize=12,
         linewidth=4,
@@ -114,7 +126,7 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
     ax.plot(
         indices,
         family_df["last_layer_decoding_accuracy"],
-        marker=None,
+        marker=None if len(family_df) > 1 else "o",
         color=last_layer_decoding_color,
         markersize=12,
         linewidth=4,
@@ -125,7 +137,7 @@ for family_i, (family, family_df) in enumerate(plot_df.groupby("family", observe
     ax.plot(
         indices,
         family_df["spearman_rho"],
-        marker=None,
+        marker=None if len(family_df) > 1 else "o",
         markersize=12,
         linewidth=4,
         color=correlation_color,

@@ -11,14 +11,14 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-# for model_id in models_lookup.keys():
-#     if models_lookup[model_id]["family"] == "glm":
-#         lr_train(model_id)
-#         lr_bootstrap(model_id)
+for model_id in models_lookup.keys():
+    if models_lookup[model_id]["family"] == "gemma4":
+        lr_train(model_id)
+        lr_bootstrap(model_id)
         # run_all_permutations(model_id, n_permutations=1000)
         # lr_significance(model_id)
         # lr_visualize(model_id)
         print('✅')
 
-lr_visualize_all_models("glm")
+lr_visualize_all_models("gemma4")
 lr_summarize()

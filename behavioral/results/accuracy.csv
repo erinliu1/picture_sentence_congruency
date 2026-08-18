@@ -17,4 +17,12 @@ llava_ov_05b,0.571875
 llava_ov_7b,0.83125
 llava_ov_72b,0.940625
 glm_9b,0.91875
+gemma3_4b,0.9
+gemma3_12b,0.971875
+gemma3_27b,0.95625
+gemma4_e2b,0.728125
+gemma4_e4b,0.7375
+gemma4_12b,0.94375
+gemma4_26b_a4b,0.965625
+gemma4_31b,0.959375
 human,0.9875

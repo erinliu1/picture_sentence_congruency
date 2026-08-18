@@ -94,10 +94,8 @@ def extract_ratings(model_id):
 
     # PLM frequently ignores the "respond with exactly one token" instruction and starts a free-text
     # reply (e.g. "She", "The", continuing/captioning the sentence) instead of a bare rating digit right
-    # after the chat template's generation prompt -- so most of next-token probability mass can land
-    # outside RATING_TOKEN_IDS, especially for plm_8b (median total_probability_mass ~0.002 without this).
-    # Priming the assistant turn with a literal "Rating: " before reading logits forces the model into the
-    # right format (verified: total_probability_mass on plm_8b jumps from ~0.01-0.03 to ~0.87-0.99).
+    # after the chat template's generation prompt.
+    # Priming the assistant turn with the word "Rating: " before reading logits forces the model into the right format.
     ASSISTANT_PREFIX = "Rating: "
     ASSISTANT_PREFIX_IDS = processor.tokenizer.encode(ASSISTANT_PREFIX, add_special_tokens=False)
 

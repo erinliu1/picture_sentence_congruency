@@ -25,10 +25,7 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-# All Gemma 3 checkpoints are dense, run on a single GPU, and tokenize rating digits "1"-"5" as single
-# tokens (verified via behavioral_gemma3_test.py against all three sizes) -- no "thinking"/box-marker
-# wrapping (unlike GLM-4.6V) and no assistant-prefix priming needed (unlike PLM): a plain single
-# forward pass reading logits[0, -1] gave total_probability_mass == 1.0000 on every row tested.
+# All Gemma 3 checkpoints are dense, run on a single GPU, and tokenize rating digits "1"-"5" as single tokens.
 # Gated on Hugging Face -- HF_TOKEN's account must be approved for google/gemma-3-{4b,12b,27b}-it.
 GEMMA3_DENSE_LOOKUP = {
     "gemma3_4b": "google/gemma-3-4b-it",

@@ -126,24 +126,59 @@
         "size": "9B"
     },
     "gemma3_4b": {
-        "title": "Gemma-3-4B",
+        "title": "Gemma3-4B",
         "color": "#FDE68A",
         "family": "gemma3",
         "type": "dense",
         "size": "4B"
     },
     "gemma3_12b": {
-        "title": "Gemma-3-12B",
+        "title": "Gemma3-12B",
         "color": "#F59E0B",
         "family": "gemma3",
         "type": "dense",
         "size": "12B"
     },
     "gemma3_27b": {
-        "title": "Gemma-3-27B",
+        "title": "Gemma3-27B",
         "color": "#B45309",
         "family": "gemma3",
         "type": "dense",
         "size": "27B"
+    },
+    "gemma4_e2b": {
+        "title": "Gemma4-E2B",
+        "color": "#FFEDD5",
+        "family": "gemma4",
+        "type": "PLE",
+        "size": "E2B"
+    },
+    "gemma4_e4b": {
+        "title": "Gemma4-E4B",
+        "color": "#FDBA74",
+        "family": "gemma4",
+        "type": "PLE",
+        "size": "E4B"
+    },
+    "gemma4_12b": {
+        "title": "Gemma4-12B",
+        "color": "#FB923C",
+        "family": "gemma4",
+        "type": "dense",
+        "size": "12B"
+    },
+    "gemma4_26b_a4b": {
+        "title": "Gemma4-26B-A4B",
+        "color": "#EA580C",
+        "family": "gemma4",
+        "type": "moe",
+        "size": "26B-A4B"
+    },
+    "gemma4_31b": {
+        "title": "Gemma4-31B",
+        "color": "#7C2D12",
+        "family": "gemma4",
+        "type": "dense",
+        "size": "31B"
     }
 }

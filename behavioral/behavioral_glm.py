@@ -25,6 +25,7 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
+# GLM-4.6V checkpoints tokenize rating digits "1"-"5" as single tokens, but sometimes output a box-marker token "<|begin_of_box|>" before the rating digit.
 GLM_DENSE_LOOKUP = {
     "glm_9b": "zai-org/GLM-4.6V-Flash",
 }
