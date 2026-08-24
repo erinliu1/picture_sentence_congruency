@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"  # Set the GPU device to use
+
 from pathlib import Path
 
 from dotenv import load_dotenv

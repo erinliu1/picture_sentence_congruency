@@ -142,7 +142,7 @@ models_lookup = {
         "color": "#0E7490",
         "family": "glm",
         "type": "moe",
-        "size": "106-A12B",
+        "size": "106B-A12B",
     },
     'gemma3_4b': {
         "title": "Gemma3-4B",

@@ -1,3 +1,6 @@
+#%%
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"  # Set the GPU device to use
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,7 +17,7 @@ from transformers import AutoProcessor, Glm4vMoeForConditionalGeneration
 import torch.nn.functional as F
 import pandas as pd
 from tqdm import tqdm
-
+#%%
 STIMULI_PATH = Path("/Intern/Erin/picture_sentence_congruency/stimuli")
 PICTURES_DIR = Path("/Intern/Erin/picture_sentence_congruency/stimuli/pictures")
 
@@ -51,6 +54,7 @@ Use the following rating scale:
 Respond with exactly one token: 1, 2, 3, 4, or 5. Do not output any additional text.
 """.strip()
 
+#%%
 def extract_ratings_glm(model_id):
     title = models[model_id]["title"]
     print(f'Loading {title}:')
@@ -58,7 +62,7 @@ def extract_ratings_glm(model_id):
         models[model_id]["name"],
         dtype="auto",
         device_map="auto",
-        attn_implementation="sdpa"
+        # attn_implementation="sdpa"
     )
     model.eval()
     processor = AutoProcessor.from_pretrained(models[model_id]["name"])
@@ -182,5 +186,6 @@ def extract_ratings_glm(model_id):
 
     del model
     torch.cuda.empty_cache()
-
+#%%
 extract_ratings_glm("glm_106b_a12b")
+# %%

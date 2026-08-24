@@ -1,11 +1,13 @@
 # For every stimulus, feed to each GLM-4.6V model, pull out the model's internal hidden states at the last word of the sentence, for every layer.
 # Saves a .pt file per stimulus, naming convention as {item_index}_{image_word}_{condition}.pt
 # item_index is the order of the stimulus in the sentences.json
-
 from __future__ import annotations
 
-import json
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"  # Set the GPU device to use
+
+
+import json
 import random
 import subprocess
 

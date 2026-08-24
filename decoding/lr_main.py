@@ -12,7 +12,8 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
 for model_id in models_lookup.keys():
-    if models_lookup[model_id]["family"] in ["gemma3", "gemma4"]:
+    # if models_lookup[model_id]["family"] in ["gemma3", "gemma4"]:
+    if model_id in ["glm_106b_a12b", "qwen3_vl_235b_a22b_instruct"]:
         # lr_train(model_id)
         # lr_bootstrap(model_id)
         run_all_permutations(model_id, n_permutations=1000)
@@ -20,6 +21,6 @@ for model_id in models_lookup.keys():
         lr_visualize(model_id)
         print('✅')
 
-lr_visualize_all_models("gemma3")
-lr_visualize_all_models("gemma4")
+lr_visualize_all_models("glm")
+lr_visualize_all_models("qwen")
 # lr_summarize()

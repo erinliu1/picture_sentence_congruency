@@ -11,6 +11,8 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
 PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/behavioral/plots")
+RESULTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/behavioral/results")
+RESULTS_DIR.mkdir(exist_ok=True)
 
 def extract_health(model_id):
     BEHAVIOR_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/behavior")
@@ -76,8 +78,8 @@ def extract_health(model_id):
     plt.close(fig)
 
     summary_rows = []
-    for condition in ["congruent", "incongruent"]:
-        condition_df = df.query("condition == @condition")
+    for condition in ["congruent", "incongruent", "all"]:
+        condition_df = df if condition == "all" else df.query("condition == @condition")
         row = {
             "condition": condition,
             "mean_rating": condition_df["rating"].mean(),
@@ -98,4 +100,24 @@ def save_all_health():
     for model_id in sorted(models_lookup.keys()):
         extract_health(model_id)
     print("All health results saved.")
+
+
+def save_health_summary():
+    proportion_cols = [f"proportion_top_one_token_{value}" for value in range(1, 6)]
+    summary_records = []
+    for model_id in models_lookup.keys():
+        health_path = MODELS_DIR / model_id / "behavior" / "health.csv"
+        try:
+            health_df = pd.read_csv(health_path)
+        except FileNotFoundError:
+            print(f"health.csv not found for {models_lookup[model_id]['title']}, skipping")
+            continue
+
+        health_df = health_df[["condition"] + proportion_cols].copy()
+        health_df.insert(0, "source", model_id)
+        summary_records.append(health_df)
+
+    summary_df = pd.concat(summary_records, ignore_index=True)
+    summary_df.to_csv(RESULTS_DIR / "health.csv", index=False)
+    print("Health summary saved.")
 

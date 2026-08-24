@@ -1,0 +1,138 @@
+item_index,sentence,image_word,condition,num_model_mistakes,models_with_mistake,human_mistake
+18,He walked out of the interview relieved.,depressed,incongruent,19,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma3-12B; Gemma3-27B; Gemma4-12B; Gemma4-26B-A4B; Gemma4-31B,False
+12,The crowd was overcome with joy.,outrage,incongruent,18,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; InternVL3-8B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma3-12B; Gemma3-27B; Gemma4-12B; Gemma4-26B-A4B; Gemma4-31B,False
+36,I looked around the store for mangoes.,mangoes,congruent,17,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; Qwen3-VL-32B-Instruct; Qwen3-VL-30B-A3B-Instruct; Qwen3-VL-235B-A22B-Instruct; InternVL3-8B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-27B; Gemma4-12B,False
+9,"Realizing the time, she hurried towards the terminal.",classroom,incongruent,14,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-30B-A3B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-12B; Gemma4-12B; Gemma4-26B-A4B,False
+16,They cheered loudly for the racers.,orchestra,incongruent,14,Qwen3-VL-2B-Instruct; Qwen3-VL-30B-A3B-Instruct; Qwen3-VL-235B-A22B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-27B; Gemma4-12B; Gemma4-26B-A4B; Gemma4-31B,False
+19,"Over the course of the semester, she lost a lot of friends.",friends,congruent,12,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; Qwen3-VL-32B-Instruct; Qwen3-VL-30B-A3B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; InternVL3-78B-Instruct; PLM-3B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma4-31B,True
+50,The cat leaped towards the sky.,sofa,incongruent,10,Qwen3-VL-4B-Instruct; Qwen3-VL-235B-A22B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; Gemma3-4B; Gemma3-12B; Gemma3-27B,False
+54,"After many months, she was excited to finally see her niece.",husband,incongruent,10,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct; InternVL3-14B-Instruct; InternVL3-38B-Instruct; PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma4-12B,False
+13,She called to say she was on the road stuck in the traffic.,snowstorm,incongruent,10,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-30B-A3B-Instruct; InternVL3-14B-Instruct; InternVL3-78B-Instruct; LLaVA-OV-72B; GLM-4.6V-106B-A12B; Gemma3-12B; Gemma3-27B; Gemma4-12B,False
+64,I rushed right over after hearing about his arrest.,arrest,congruent,9,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; Qwen3-VL-235B-A22B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; PLM-3B; Gemma3-27B; Gemma4-31B,False
+72,She changed into her gown.,sweats,incongruent,9,Qwen3-VL-8B-Instruct; InternVL3-8B-Instruct; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-106B-A12B; Gemma3-27B; Gemma4-12B; Gemma4-26B-A4B; Gemma4-31B,False
+40,She looked around but could not find her sock.,sock,congruent,9,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-8B-Instruct; PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma4-12B,False
+51,He struggled with obesity.,obesity,congruent,8,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; PLM-3B; Gemma3-4B; Gemma4-12B; Gemma4-31B,False
+20,She put on her favorite lipstick.,lipstick,congruent,7,Qwen3-VL-8B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-38B-Instruct; PLM-3B; GLM-4.6V-106B-A12B; Gemma4-12B; Gemma4-31B,False
+15,"Upon arriving, she realized she forgot to bring her calculator.",instrument,incongruent,7,Qwen3-VL-30B-A3B-Instruct; InternVL3-14B-Instruct; LLaVA-OV-72B; Gemma3-4B; Gemma4-12B; Gemma4-26B-A4B; Gemma4-31B,False
+64,I rushed right over after hearing about his stroke.,stroke,congruent,7,Qwen3-VL-2B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; PLM-3B; Gemma4-12B; Gemma4-31B,False
+41,Everyone stared because she was naked.,naked,congruent,7,Qwen3-VL-2B-Instruct; Qwen3-VL-30B-A3B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; PLM-3B; LLaVA-OV-7B; Gemma3-4B,False
+23,She was getting ready for her operation.,operation,congruent,7,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; InternVL3-38B-Instruct; PLM-3B; Gemma3-4B,False
+1,"Hearing the news, he could not hide his disappointment.",disappointment,congruent,7,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct; PLM-3B; LLaVA-OV-7B; Gemma3-4B; Gemma3-12B; Gemma4-31B,False
+22,"Hearing his words, she was reassured.",skeptical,incongruent,6,Qwen3-VL-4B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B,False
+8,"At the family gathering, she told them about her cancer.",cancer,congruent,6,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; PLM-3B; Gemma4-31B,False
+15,"Upon arriving, she realized she forgot to bring her instrument.",instrument,congruent,6,Qwen3-VL-2B-Instruct; Qwen3-VL-8B-Instruct; InternVL3-8B-Instruct; PLM-3B; LLaVA-OV-7B; Gemma4-31B,False
+25,He was talking with his teacher.,daughter,incongruent,5,InternVL3-14B-Instruct; InternVL3-78B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B,False
+30,"When she opened her grade, she was appalled.",overjoyed,incongruent,5,InternVL3-14B-Instruct; GLM-4.6V-9B; GLM-4.6V-106B-A12B; Gemma3-4B; Gemma4-26B-A4B,False
+52,He was so tired he fell asleep during the quiz.,commute,incongruent,5,InternVL3-14B-Instruct; InternVL3-38B-Instruct; PLM-3B; LLaVA-OV-7B; Gemma3-27B,False
+8,"At the family gathering, she told them about her cancer.",engagement,incongruent,4,InternVL3-14B-Instruct; PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B,False
+9,"Realizing the time, she hurried towards the classroom.",terminal,incongruent,4,InternVL3-14B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B,False
+65,He needed his pacifier.,pacifier,congruent,4,Qwen3-VL-2B-Instruct; Qwen3-VL-8B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct,False
+27,He was arguing with his brother.,mother,incongruent,4,InternVL3-14B-Instruct; PLM-3B; GLM-4.6V-9B; Gemma3-27B,False
+54,"After many months, she was excited to finally see her husband.",niece,incongruent,4,Qwen3-VL-2B-Instruct; InternVL3-14B-Instruct; PLM-3B; LLaVA-OV-7B,False
+60,She was very close to her father.,sister,incongruent,4,InternVL3-14B-Instruct; PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B,False
+17,She was planning for her playdate.,retirement,incongruent,4,PLM-3B; LLaVA-OV-7B; GLM-4.6V-9B; GLM-4.6V-106B-A12B,False
+63,She found out about his grades.,affair,incongruent,4,InternVL3-14B-Instruct; LLaVA-OV-7B; GLM-4.6V-9B; Gemma4-12B,False
+6,"Every morning, she warmly greets the students.",students,congruent,4,Qwen3-VL-4B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; Gemma4-12B,False
+73,He needed to make the deadline.,bed,incongruent,4,Qwen3-VL-30B-A3B-Instruct; PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B,False
+15,"Upon arriving, she realized she forgot to bring her calculator.",calculator,congruent,4,InternVL3-8B-Instruct; PLM-3B; GLM-4.6V-9B; Gemma3-4B,False
+62,She was came home for the funeral.,funeral,congruent,4,Qwen3-VL-2B-Instruct; Qwen3-VL-32B-Instruct; PLM-3B; Gemma3-4B,False
+45,He couldn't believe he had gotten promoted.,fired,incongruent,4,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct; InternVL3-14B-Instruct; LLaVA-OV-7B,False
+43,His comment made her flattered.,offended,incongruent,4,PLM-3B; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B,False
+62,She was came home for the holidays.,holidays,congruent,4,Qwen3-VL-2B-Instruct; Qwen3-VL-32B-Instruct; GLM-4.6V-106B-A12B; Gemma3-4B,False
+11,"As he got older, he felt more lonely.",confident,incongruent,4,InternVL3-14B-Instruct; LLaVA-OV-7B; LLaVA-OV-72B; GLM-4.6V-9B,False
+25,He was talking with his daughter.,teacher,incongruent,4,InternVL3-14B-Instruct; InternVL3-78B-Instruct; GLM-4.6V-9B; Gemma4-12B,False
+46,She received the news about the celebration.,shooting,incongruent,3,Qwen3-VL-2B-Instruct; LLaVA-OV-7B; GLM-4.6V-9B,False
+63,She found out about his affair.,grades,incongruent,3,InternVL3-14B-Instruct; LLaVA-OV-7B; LLaVA-OV-72B,False
+61,He had been looking forward to see the sunset.,game,incongruent,3,GLM-4.6V-9B; Gemma4-12B; Gemma4-26B-A4B,False
+50,The cat leaped towards the sofa.,sky,incongruent,3,Qwen3-VL-4B-Instruct; InternVL3-38B-Instruct; Gemma3-27B,False
+30,"When she opened her grade, she was overjoyed.",appalled,incongruent,3,Qwen3-VL-4B-Instruct; InternVL3-78B-Instruct; LLaVA-OV-7B,False
+64,I rushed right over after hearing about his stroke.,arrest,incongruent,3,LLaVA-OV-7B; LLaVA-OV-72B; Gemma3-12B,False
+43,His comment made her offended.,offended,congruent,3,Qwen3-VL-2B-Instruct; PLM-3B; Gemma3-4B,False
+58,She was getting ready to go play in the snow.,snow,congruent,3,Qwen3-VL-2B-Instruct; Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct,True
+5,He was experiencing feelings of great distress.,tranquility,incongruent,3,InternVL3-8B-Instruct; InternVL3-38B-Instruct; GLM-4.6V-9B,False
+21,She listened as her parents' sang.,sang,congruent,3,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct; Gemma4-12B,False
+10,He realized he was out of groceries.,cash,incongruent,3,Qwen3-VL-2B-Instruct; GLM-4.6V-9B; Gemma3-4B,False
+74,She didn't want to go to jail.,jail,congruent,3,Qwen3-VL-2B-Instruct; Qwen3-VL-4B-Instruct; PLM-3B,False
+19,"Over the course of the semester, she lost a lot of weight.",friends,incongruent,3,Qwen3-VL-235B-A22B-Instruct; LLaVA-OV-7B; GLM-4.6V-9B,False
+14,He couldn't hold back his laughter.,frustration,incongruent,3,Qwen3-VL-2B-Instruct; InternVL3-14B-Instruct; PLM-3B,False
+4,She handed me the menu.,menu,congruent,3,Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct; GLM-4.6V-106B-A12B,True
+11,"As he got older, he felt more confident.",lonely,incongruent,3,Qwen3-VL-2B-Instruct; LLaVA-OV-72B; GLM-4.6V-9B,False
+22,"Hearing his words, she was skeptical.",skeptical,congruent,3,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct; Gemma3-4B,False
+59,He was glad he did not forget his plushy.,passport,incongruent,2,Qwen3-VL-4B-Instruct; PLM-3B,False
+49,She was looking for her keys.,parents,incongruent,2,InternVL3-14B-Instruct; PLM-3B,False
+60,She was very close to her sister.,father,incongruent,2,InternVL3-14B-Instruct; PLM-3B,False
+4,She handed me the menu.,prescription,incongruent,2,LLaVA-OV-7B; Gemma3-4B,False
+2,She was glad she wore her sandals.,sandals,congruent,2,Qwen3-VL-32B-Instruct; GLM-4.6V-106B-A12B,False
+1,"Hearing the news, he could not hide his delight.",disappointment,incongruent,2,PLM-3B; LLaVA-OV-7B,False
+47,He was looking for a crayon.,crayon,congruent,2,InternVL3-8B-Instruct; Gemma3-12B,False
+74,She didn't want to go to kindergarten.,kindergarten,congruent,2,PLM-3B; LLaVA-OV-7B,False
+46,She received the news about the shooting.,shooting,congruent,2,Qwen3-VL-2B-Instruct; Gemma3-4B,False
+46,She received the news about the shooting.,celebration,incongruent,2,PLM-3B; LLaVA-OV-7B,False
+7,The meeting quickly reached a deadlock.,deadlock,congruent,2,PLM-3B; Gemma3-4B,False
+8,"At the family gathering, she told them about her engagement.",cancer,incongruent,2,LLaVA-OV-7B; LLaVA-OV-72B,False
+55,She was excited to watch the sunrise.,sunrise,congruent,2,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct,False
+42,"At the party, she was shy.",shy,congruent,2,LLaVA-OV-7B; Gemma3-4B,False
+24,They were looking at the aftermath.,bride,incongruent,2,PLM-3B; Gemma4-26B-A4B,False
+12,The crowd was overcome with outrage.,joy,incongruent,2,InternVL3-78B-Instruct; PLM-3B,False
+40,She looked around but could not find her car.,car,congruent,2,PLM-3B; Gemma3-4B,False
+16,They cheered loudly for the orchestra.,racers,incongruent,2,PLM-3B; LLaVA-OV-7B,False
+30,"When she opened her grade, she was appalled.",appalled,congruent,2,Qwen3-VL-2B-Instruct; InternVL3-8B-Instruct,False
+21,She listened as her parents' sang.,fought,incongruent,2,InternVL3-14B-Instruct; LLaVA-OV-7B,False
+33,He looked at me in a way that felt flirtatious.,flirtatious,congruent,2,Gemma3-4B; Gemma3-27B,False
+73,He needed to make the bed.,bed,congruent,2,Qwen3-VL-4B-Instruct; Gemma3-12B,False
+35,He noticed she was being very distant.,distant,congruent,2,Gemma3-4B; Gemma4-26B-A4B,False
+64,I rushed right over after hearing about his arrest.,stroke,incongruent,2,LLaVA-OV-7B; LLaVA-OV-72B,False
+37,The kids played in the playroom.,park,incongruent,2,PLM-3B; LLaVA-OV-7B,False
+37,The kids played in the park.,playroom,incongruent,2,Gemma3-4B; Gemma3-27B,False
+27,He was arguing with his mother.,brother,incongruent,2,InternVL3-14B-Instruct; LLaVA-OV-7B,False
+68,She was changing her diaper.,diaper,congruent,2,Qwen3-VL-32B-Instruct; InternVL3-8B-Instruct,False
+39,She held her hands excitedly.,solemnly,incongruent,2,PLM-3B; LLaVA-OV-7B,False
+29,"When she opened the exam, she felt hopeless.",hopeless,congruent,2,Qwen3-VL-2B-Instruct; Gemma3-4B,False
+70,He listened to the lullaby.,lullaby,congruent,1,InternVL3-8B-Instruct,False
+74,She didn't want to go to jail.,kindergarten,incongruent,1,Qwen3-VL-2B-Instruct,False
+79,She was struggling with alcoholism.,alcoholism,congruent,1,Gemma3-4B,False
+78,They were watching the playoffs.,cartoon,incongruent,1,PLM-3B,False
+61,He had been looking forward to see the sunset.,sunset,congruent,1,Gemma3-4B,False
+70,He listened to the thunder.,thunder,congruent,1,GLM-4.6V-9B,False
+71,He changed into his uniform.,pajamas,incongruent,1,PLM-3B,False
+56,They chatted at the banquet.,lecture,incongruent,1,LLaVA-OV-7B,False
+63,She found out about his grades.,grades,congruent,1,PLM-3B,False
+74,She didn't want to go to kindergarten.,jail,incongruent,1,InternVL3-14B-Instruct,False
+62,She was came home for the holidays.,funeral,incongruent,1,LLaVA-OV-7B,False
+63,She found out about his affair.,affair,congruent,1,PLM-3B,False
+0,She needed to put everything in the library.,library,congruent,1,InternVL3-8B-Instruct,False
+36,I looked around the store for headphones.,headphones,congruent,1,PLM-3B,False
+56,They chatted at the lecture.,banquet,incongruent,1,LLaVA-OV-7B,False
+17,She was planning for her retirement.,retirement,congruent,1,Qwen3-VL-32B-Instruct,False
+26,He liked to spend time with his grandma.,roommate,incongruent,1,Gemma3-4B,False
+26,He liked to spend time with his roommate.,grandma,incongruent,1,LLaVA-OV-7B,False
+22,"Hearing his words, she was reassured.",reassured,congruent,1,InternVL3-8B-Instruct,False
+21,She listened as her parents' fought.,fought,congruent,1,PLM-3B,False
+20,She put on her favorite song.,lipstick,incongruent,1,LLaVA-OV-7B,False
+18,He walked out of the interview depressed.,depressed,congruent,1,Gemma3-4B,False
+15,"Upon arriving, she realized she forgot to bring her instrument.",calculator,incongruent,1,Qwen3-VL-2B-Instruct,False
+56,They chatted at the banquet.,banquet,congruent,1,PLM-3B,False
+14,He couldn't hold back his frustration.,laughter,incongruent,1,InternVL3-14B-Instruct,False
+7,The meeting quickly reached a consensus.,deadlock,incongruent,1,PLM-3B,False
+6,"Every morning, she warmly greets the patients.",patients,congruent,1,InternVL3-8B-Instruct,False
+4,She handed me the prescription.,menu,incongruent,1,LLaVA-OV-7B,False
+3,She spent months preparing for the exam.,marathon,incongruent,1,LLaVA-OV-7B,False
+3,She spent months preparing for the marathon.,exam,incongruent,1,LLaVA-OV-7B,False
+28,They got along in prison.,preschool,incongruent,1,LLaVA-OV-7B,False
+28,They got along in preschool.,prison,incongruent,1,LLaVA-OV-7B,False
+29,"When she opened the exam, she felt hopeless.",hopeful,incongruent,1,GLM-4.6V-9B,False
+33,He looked at me in a way that felt flirtatious.,accusatory,incongruent,1,LLaVA-OV-7B,False
+34,She looked over lovingly.,disapprovingly,incongruent,1,InternVL3-14B-Instruct,False
+35,He noticed she was being very playful.,distant,incongruent,1,LLaVA-OV-7B,False
+0,She needed to put everything in the refrigerator.,refrigerator,congruent,1,InternVL3-8B-Instruct,False
+39,She held her hands solemnly.,excitedly,incongruent,1,PLM-3B,False
+42,"At the party, she was shy.",lively,incongruent,1,PLM-3B,False
+43,His comment made her offended.,flattered,incongruent,1,Gemma4-26B-A4B,False
+45,He couldn't believe he had gotten fired.,promoted,incongruent,1,PLM-3B,False
+48,She was looking for a waiter.,waiter,congruent,1,InternVL3-8B-Instruct,False
+48,She was looking for a taxi.,waiter,incongruent,1,PLM-3B,False
+49,She was looking for her keys.,keys,congruent,1,Gemma3-4B,False
+49,She was looking for her parents.,keys,incongruent,1,PLM-3B,False
+53,She was experiencing an intense migraine.,excitement,incongruent,1,PLM-3B,False
+79,She was struggling with academics.,alcoholism,incongruent,1,Gemma3-27B,False
+59,He was glad he did not forget his passport.,passport,congruent,0,,True
