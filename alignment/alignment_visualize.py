@@ -126,8 +126,8 @@ def plot_alignment_for_all_models(family):
     ax.set_xlim(0, 1)
     ax.set_xticks(np.linspace(0, 1, 6))
 
-    ax.set_ylim(0, 1.51)
-    ax.set_yticks(np.arange(0, 1.51, 0.25))
+    ax.set_ylim(0, 2.0)
+    ax.set_yticks(np.arange(0, 2.01, 0.25))
 
     for spine in ax.spines.values():
         spine.set_linewidth(2)
@@ -138,18 +138,49 @@ def plot_alignment_for_all_models(family):
         alpha=0.3,
     )
 
-    ax.legend(
-        fontsize=17,
-        ncol=1,
-        framealpha=0.9,
-        loc="lower right",
-    )
-
     fig.tight_layout()
 
     fig.savefig(
-        plots_dir / f"all_{family}.pdf",
+        plots_dir / f"all_{family}.png",
+        dpi=300,
         bbox_inches="tight",
     )
 
     plt.close(fig)
+    print(f"Alignment plot for all {family} models saved.")
+
+    plot_alignment_legend(family)
+
+
+def plot_alignment_legend(family):
+    models_to_plot = [model_id for model_id, info in models_lookup.items() if info["family"] == family]
+    plots_dir = PLOTS_DIR / family
+    plots_dir.mkdir(exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    handles = []
+    for model_id in models_to_plot:
+        title = models_lookup[model_id]["title"]
+        color = models_lookup[model_id]["color"]
+        handle, = ax.plot([], [], color=color, linewidth=4, label=title)
+        handles.append(handle)
+
+    legend = ax.legend(
+        handles=handles,
+        fontsize=17,
+        ncol=1,
+        framealpha=0.9,
+        loc="center",
+    )
+    ax.axis("off")
+
+    fig.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(
+        plots_dir / f"legend_{family}.png",
+        dpi=300,
+        bbox_inches=bbox.expanded(1.1, 1.1),
+    )
+
+    plt.close(fig)
+    print(f"Alignment legend for {family} saved.")

@@ -9,11 +9,11 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-BEHAVIORAL_DIR = Path("/Intern/Erin/picture_sentence_congruency/behavioral/results")
-PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/behavioral/plots")
-accuracy_df = pd.read_csv(BEHAVIORAL_DIR / "accuracy.csv")
-concordance_df = pd.read_csv(BEHAVIORAL_DIR / "concordance_scores.csv")
-correlation_df = pd.read_csv(BEHAVIORAL_DIR / "correlation.csv")
+DECODING_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/results")
+ALIGNMENT_DIR = Path("/Intern/Erin/picture_sentence_congruency/alignment/results")
+PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/plots")
+decoding_df = pd.read_csv(DECODING_DIR / "summary.csv")
+alignment_df = pd.read_csv(ALIGNMENT_DIR / "alignment_summary.csv")
 
 family_lookup = {
     "qwen": {"label": "Qwen3-VL"},
@@ -41,7 +41,7 @@ family_linestyles = {
     "gemma3": "--"
 }
 
-plot_df = accuracy_df.merge(concordance_df, on="source").merge(correlation_df, on="source")
+plot_df = decoding_df.merge(alignment_df, on="source")
 plot_df["family"] = plot_df["source"].map(lambda x: models_lookup[x]["family"])
 plot_df["family"] = pd.Categorical(plot_df["family"], categories=family_lookup.keys(), ordered=True)
 plot_df["size"] = plot_df["source"].map(lambda x: models_lookup[x]["size"])
@@ -50,11 +50,12 @@ plot_df["size"] = plot_df["source"].map(lambda x: models_lookup[x]["size"])
 plot_df["params_b"] = plot_df["size"].str.extract(r"(\d+(?:\.\d+)?)")[0].astype(float)
 plot_df = plot_df.sort_values(by=["family", "params_b"]).reset_index(drop=True)
 
-LABEL_FS = 21
-TICK_FS = 20
+LABEL_FS = 22
+TICK_FS = 22
+LEGEND_FS = 22
 
-fig, (ax_acc, ax_conc, ax_rho) = plt.subplots(
-    1, 3, figsize=(10, 4.6), sharex=True, gridspec_kw={"wspace": 0.28}
+fig, (ax_peak, ax_align) = plt.subplots(
+    1, 2, figsize=(9, 5.2), sharex=True, gridspec_kw={"wspace": 0.2}
 )
 
 for family, family_df in plot_df.groupby("family", observed=True, sort=False):
@@ -62,11 +63,10 @@ for family, family_df in plot_df.groupby("family", observed=True, sort=False):
     color = family_colors[family]
     linestyle = family_linestyles.get(family, "-")
 
-    ax_acc.plot(family_df["params_b"], family_df["accuracy"], color=color, linestyle=linestyle, linewidth=3.5, zorder=2)
-    ax_conc.plot(family_df["params_b"], family_df["concordance"], color=color, linestyle=linestyle, linewidth=3.5, zorder=2)
-    ax_rho.plot(family_df["params_b"], family_df["spearman_rho"], color=color, linestyle=linestyle, linewidth=3.5, zorder=2)
+    ax_peak.plot(family_df["params_b"], family_df["peak_decoding_accuracy"], color=color, linestyle=linestyle, linewidth=5, zorder=2)
+    ax_align.plot(family_df["params_b"], family_df["max_coeff"], color=color, linestyle=linestyle, linewidth=5, zorder=2)
 
-for ax in (ax_acc, ax_conc, ax_rho):
+for ax in (ax_peak, ax_align):
     ax.set_xscale("log")
     ax.tick_params(axis="both", labelsize=TICK_FS, width=1.5, length=6)
     ax.tick_params(axis="x", which="minor", length=0)
@@ -74,16 +74,22 @@ for ax in (ax_acc, ax_conc, ax_rho):
         spine.set_linewidth(1.5)
     ax.grid(True, linewidth=1, alpha=0.3)
 
-ax_acc.set_title("Accuracy", fontsize=LABEL_FS, pad=10)
-ax_conc.set_title("Concordance", fontsize=LABEL_FS, pad=10)
-ax_rho.set_title("Spearman's ρ", fontsize=LABEL_FS, pad=10)
+ax_peak.set_yticks([0.90, 0.95, 1.0])
+ax_peak.set_ylim(0.88, 1.0)
+ax_align.set_yticks([0, 1, 2])
+ax_align.set_ylim(0, 2)
+
+ax_peak.set_title("Peak Decoding Accuracy", fontsize=LABEL_FS, pad=10)
+ax_align.set_title("Peak Alignment Coefficient", fontsize=LABEL_FS, pad=10)
+
+fig.supxlabel("Model Size (Billions of Parameters)", fontsize=LABEL_FS, y=0.28)
 
 family_handles = [
     Line2D(
         [0], [0],
         color=family_colors[family],
         linestyle=family_linestyles.get(family, "-"),
-        linewidth=3,
+        linewidth=5,
         label=info["label"],
     )
     for family, info in family_lookup.items()
@@ -92,13 +98,13 @@ family_handles = [
 fig.legend(
     handles=family_handles,
     loc="lower center",
-    bbox_to_anchor=(0.5, 0.0),
-    ncol=4,
-    fontsize=18,
+    bbox_to_anchor=(0.5, -0.08),
+    ncol=3,
+    fontsize=LEGEND_FS,
     framealpha=0.9,
 )
 
-fig.subplots_adjust(left=0.04, right=0.99, top=0.9, bottom=0.32)
+fig.subplots_adjust(left=0.06, right=0.99, top=0.92, bottom=0.46)
 
-plt.savefig(PLOTS_DIR / "scaling3.pdf", bbox_inches="tight")
+plt.savefig(PLOTS_DIR / "scaling.pdf", bbox_inches="tight")
 plt.show()

@@ -11,10 +11,10 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-HUMAN_PATH = Path("/Intern/Erin/picture_sentence_congruency/survey/results/ratings.csv")
+# HUMAN_PATH = Path("/Intern/Erin/picture_sentence_congruency/survey/results/ratings.csv")
 
-human_df = pd.read_csv(HUMAN_PATH)
-human_df = (human_df.groupby(["item_index", "image_word", "condition"], as_index=False)["rating"].mean())
+# human_df = pd.read_csv(HUMAN_PATH)
+# human_df = (human_df.groupby(["item_index", "image_word", "condition"], as_index=False)["rating"].mean())
 
 def get_alignment(model_id):
     model_dir = MODELS_DIR / model_id
@@ -22,9 +22,10 @@ def get_alignment(model_id):
     output_dir.mkdir(exist_ok=True)
 
     classifier_results_df = pd.read_csv(model_dir / "decoding" / "results.csv")
+    behavioral_results_df = pd.read_csv(model_dir / "behavior" / "ratings.csv")
 
     combined_df = classifier_results_df.merge(
-        human_df,
+        behavioral_results_df,
         on=["item_index", "image_word", "condition"],
         how="left"
     ).drop(columns=["pass"])
@@ -61,3 +62,4 @@ def get_alignment(model_id):
     coefficients_df["significant_fdr"] = (coefficients_df["p_value_fdr"] < 0.05)
     coefficients_df.to_csv(output_dir / "coefficients.csv", index=False)
     print(f"Alignment coefficients for {model_id} saved.")
+    return coefficients_df

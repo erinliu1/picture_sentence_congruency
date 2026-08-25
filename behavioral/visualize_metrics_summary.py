@@ -1,10 +1,12 @@
 # One two-panel figure comparing every model's classification accuracy (left) and Spearman's rho vs. human ratings (right), on a shared, rho-sorted y-axis.
 #
-# Encodings:
+# Encodings (same convention as visualize_instruction_grounding.py):
 #   - color     -> model family (qwen / intern / llava / plm / glm / gemma3 / gemma4)
 #   - marker    -> model type (dense = circle, MoE = diamond, PLE = triangle)
 #   - marker size -> approximate parameter count (log-scaled; total params for MoE, "effective" params for PLE)
-#   - dashed red outline -> instruction-following flag: total_probability_mass < 0.90 on at least one trial
+#   - dashed red outline   -> instruction-following flag: total_probability_mass < 0.90 on at least one trial
+#   - dashed blue outline  -> high grounding correlation: grounding_r > 0.20
+#   - alternating red/blue dashed outline -> both of the above
 
 import json
 import re
@@ -27,6 +29,7 @@ accuracy_df = pd.read_csv(BEHAVIORAL_RESULTS_DIR / "accuracy.csv").set_index("so
 human_accuracy = accuracy_df.loc["human", "accuracy"]
 
 correlation_df = pd.read_csv(BEHAVIORAL_RESULTS_DIR / "correlation.csv").set_index("source")
+grounding_df = pd.read_csv(BEHAVIORAL_RESULTS_DIR / "grounding.csv").set_index("source")
 
 FAMILY_LABEL = {
     "qwen": "Qwen3-VL", "intern": "InternVL3", "llava": "LLaVA-OneVision", "plm": "PLM",
@@ -72,7 +75,9 @@ def get_plot_df():
             "ci_lower": correlation_df.loc[model_id, "ci_lower"],
             "ci_upper": correlation_df.loc[model_id, "ci_upper"],
             # flag if any trial's total_probability_mass < 0.90, indicating instruction-following degradation
-            "instruction_flagged": ratings_df["total_probability_mass"].min() < 0.90, 
+            "instruction_flagged": ratings_df["total_probability_mass"].min() < 0.90,
+            "grounding_r": grounding_df.loc[model_id, "grounding_r"],
+            "high_grounding": grounding_df.loc[model_id, "grounding_r"] > 0.20,
         })
     df = pd.DataFrame(rows).sort_values("rho", ascending=True).reset_index(drop=True)
     return df
@@ -91,15 +96,24 @@ y_pos = np.arange(len(plot_df))
 
 fig, (ax_acc, ax_rho) = plt.subplots(1, 2, figsize=(10, 12.5), sharey=True, gridspec_kw={"wspace": 0.4})
 
+DASH = 3  # dash segment length (points) shared by the red/blue alternating outline below
+
 for i, row in plot_df.iterrows():
     color = family_colors[row["family"]]
     marker = type_marker[row["type"]]
     size = marker_size(row["params_b"])
-    edge_kwargs = (
-        dict(edgecolors="red", linewidths=2, linestyles="dashed")
-        if row["instruction_flagged"]
-        else dict(edgecolors="black", linewidths=1, linestyles="solid")
-    )
+    low_mass = row["instruction_flagged"]  # total_probability_mass < 0.90 on at least one trial
+    high_grounding = row["high_grounding"]  # grounding_r > 0.20
+
+    if low_mass and high_grounding:
+        # both flagged: alternate red/blue dashes by overlaying two complementary dash patterns
+        edge_kwargs = dict(edgecolors="none")
+    elif high_grounding:
+        edge_kwargs = dict(edgecolors="#1200ff", linewidths=2, linestyles="dashed")
+    elif low_mass:
+        edge_kwargs = dict(edgecolors="red", linewidths=2, linestyles="dashed")
+    else:
+        edge_kwargs = dict(edgecolors="black", linewidths=1, linestyles="solid")
 
     ax_acc.scatter(row["accuracy"], i, color=color, marker=marker, s=size, alpha=0.6, zorder=3, **edge_kwargs)
     ax_acc.scatter(row["accuracy"], i, color="black", marker="o", s=12, alpha=1, zorder=4)
@@ -111,6 +125,17 @@ for i, row in plot_df.iterrows():
     )
     ax_rho.scatter(row["rho"], i, color=color, marker=marker, s=size, alpha=0.6, zorder=3, **edge_kwargs)
     ax_rho.scatter(row["rho"], i, color="black", marker="o", s=12, alpha=1, zorder=11)
+
+    if low_mass and high_grounding:
+        for dash_color, offset in [("red", 0), ("#1200ff", DASH)]:
+            ax_acc.scatter(
+                row["accuracy"], i, facecolors="none", marker=marker, s=size,
+                edgecolors=dash_color, linewidths=2, linestyles=(offset, (DASH, DASH)), zorder=5,
+            )
+            ax_rho.scatter(
+                row["rho"], i, facecolors="none", marker=marker, s=size,
+                edgecolors=dash_color, linewidths=2, linestyles=(offset, (DASH, DASH)), zorder=12,
+            )
 
 ax_acc.axvline(human_accuracy, color="grey", linestyle="--", linewidth=2, zorder=1)
 ax_acc.text(
