@@ -24,8 +24,14 @@ PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/plots")
 N_POINTS = 101
 common_grid = np.linspace(0, 1, N_POINTS)
 
-decoding_color = "tab:green"   # green
+decoding_color = "tab:green"   # green (instruct)
+decoding_base_color = "tab:orange"  # orange (base / pretrained, non-instruction-tuned)
 alignment_color = "tab:purple"  # purple
+
+# Base (pretrained, non-instruction-tuned) counterparts don't go through the alignment stage
+# (no human-rating regression has been run for them), so they only contribute a second decoding
+# curve here, not an alignment curve.
+BASE_FAMILIES = {"gemma3_base", "gemma4_base", "intern_base"}
 
 
 def normalized_layers(layer_index):
@@ -40,15 +46,25 @@ def mean_and_ci(stacked):
 
 
 decoding_curves = []
+decoding_base_curves = []
 alignment_curves = []
 significance_thresholds = []
 
-for model_id in models_lookup:
+for model_id, info in models_lookup.items():
     model_dir = MODELS_DIR / model_id
+    is_base = info["family"] in BASE_FAMILIES
 
     accuracy_df = pd.read_csv(model_dir / "decoding" / "layerwise_accuracy.csv")
     depth = normalized_layers(accuracy_df["layer_index"])
-    decoding_curves.append(np.interp(common_grid, depth, accuracy_df["all_accuracy"]))
+    interpolated_accuracy = np.interp(common_grid, depth, accuracy_df["all_accuracy"])
+
+    if is_base:
+        # Base models don't have permutation-significance or alignment stages run -- only
+        # decoding -- so they contribute a decoding curve only.
+        decoding_base_curves.append(interpolated_accuracy)
+        continue
+
+    decoding_curves.append(interpolated_accuracy)
 
     significance_df = pd.read_csv(model_dir / "decoding" / "layerwise_significance.csv")
     significance_thresholds.append(significance_df["threshold_95"].iloc[0])
@@ -61,6 +77,7 @@ for model_id in models_lookup:
     alignment_curves.append(np.interp(common_grid, depth, peak_normalized_coeff))
 
 decoding_mean, decoding_lower, decoding_upper = mean_and_ci(np.stack(decoding_curves))
+decoding_base_mean, decoding_base_lower, decoding_base_upper = mean_and_ci(np.stack(decoding_base_curves))
 alignment_mean, alignment_lower, alignment_upper = mean_and_ci(np.stack(alignment_curves))
 average_significance_threshold = np.mean(significance_thresholds)
 
@@ -69,8 +86,11 @@ TICK_FS = 18
 
 fig, (ax_dec, ax_align) = plt.subplots(1, 2, figsize=(11, 4), gridspec_kw={"wspace": 0.55})
 
-ax_dec.plot(common_grid, decoding_mean, color=decoding_color, linewidth=5, zorder=2)
+ax_dec.plot(common_grid, decoding_mean, color=decoding_color, linewidth=5, zorder=2, label="Instruct")
 ax_dec.fill_between(common_grid, decoding_lower, decoding_upper, color=decoding_color, alpha=0.2)
+ax_dec.plot(common_grid, decoding_base_mean, color=decoding_base_color, linewidth=5, zorder=2, label="Base")
+ax_dec.fill_between(common_grid, decoding_base_lower, decoding_base_upper, color=decoding_base_color, alpha=0.2)
+ax_dec.legend(fontsize=14, loc="lower right", bbox_to_anchor=(1, 0.2), framealpha=0.9)
 ax_dec.axhline(
     average_significance_threshold,
     linestyle="--",
@@ -114,17 +134,22 @@ ax_dec.set_title("Decoding Trajectory", fontsize=LABEL_FS, pad=10)
 ax_align.set_title("Alignment Trajectory", fontsize=LABEL_FS, pad=10)
 
 fig.savefig(PLOTS_DIR / "trajectory.pdf", bbox_inches="tight")
+fig.savefig(PLOTS_DIR / "trajectory.png", bbox_inches="tight", dpi=150)
 plt.show()
 
 caption = (
     "Average decoding accuracy trajectory and average alignment coefficient trajectory "
-    "relative to model peak, across normalized network depth (28 models). Left: the "
-    "layerwise congruent-vs-incongruent decoding accuracy of each model was interpolated "
-    "onto 101 evenly spaced normalized depth positions (0 = first hidden-state layer, "
-    "1 = last), then averaged across all 28 models; the shaded band is the 95% CI of the "
-    "across-model mean at each depth. The dotted gray line marks the average permutation-"
-    "based 95th-percentile significance threshold (from layerwise_significance.csv), "
-    "averaged across all 28 models. Right: each model's layerwise alignment coefficient "
+    "relative to model peak, across normalized network depth (28 instruction-tuned models, "
+    "plus 14 base/pretrained counterparts on the left panel only). Left: the layerwise "
+    "congruent-vs-incongruent decoding accuracy of each model was interpolated onto 101 "
+    "evenly spaced normalized depth positions (0 = first hidden-state layer, 1 = last), "
+    "then averaged separately across the 28 instruction-tuned models (green) and the 14 "
+    "base models (orange); each shaded band is the 95% CI of the across-model mean at each "
+    "depth for that group. Base models don't have a permutation-significance or alignment "
+    "stage run, so they contribute only this decoding curve. The dotted gray line marks the "
+    "average permutation-based 95th-percentile significance threshold (from "
+    "layerwise_significance.csv), averaged across the 28 instruction-tuned models. Right: "
+    "each instruction-tuned model's layerwise alignment coefficient "
     "(the OLS regression coefficient of human congruency ratings on the model's decoded "
     "congruent-probability) was first divided by that model's own peak coefficient, so "
     "every model's trajectory has a peak of 1 regardless of its absolute alignment "

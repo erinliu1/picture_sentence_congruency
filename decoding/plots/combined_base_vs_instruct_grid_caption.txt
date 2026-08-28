@@ -1,0 +1,20 @@
+Layer-wise congruent-vs-incongruent decoding accuracy (with 95% bootstrap CI bands) for every
+base/instruct model pair across the three families with a base checkpoint: Gemma3, Gemma4, and
+InternVL3 (columns, left to right). Rows are ordered by model size within each family, smallest
+to largest, top to bottom; rows are aligned by size rank, not by matching absolute parameter
+count across families, since the three families don't share sizes. Each subplot's x-axis is
+layer depth normalized to [0, 1] (0 = first layer, 1 = final layer) so models with different
+layer counts overlay comparably; the size label in each subplot's lower-right corner identifies
+that row's model within its family. The solid green line is the instruction-tuned checkpoint and
+the dashed orange line is its base counterpart; the gray dashed horizontal line marks the
+permutation-based significance threshold (~0.58).
+
+Across all three families and nearly every size, decoding accuracy rises sharply from
+near-threshold in the earliest layers to a peak (typically >0.9) around the middle-to-late
+layers, then often declines somewhat toward the final layer. Instruct checkpoints match or
+modestly exceed their base counterparts almost everywhere; the gap is most visible in Gemma3,
+especially at 12B and 27B, where the instruct model sustains high decoding accuracy through the
+later layers while its base counterpart decays more sharply. Gemma4 and InternVL3 instruct/base
+curves are nearly overlapping at most sizes, suggesting instruction-tuning has little effect on
+where or how strongly picture-sentence congruency is linearly decodable from those two families'
+hidden states.

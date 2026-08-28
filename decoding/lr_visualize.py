@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import json
+import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -95,6 +96,12 @@ def lr_visualize(model_id):
 def get_normalized_layers(layers):
     return (layers - layers.min()) / (layers.max() - layers.min())
 
+def get_params_b(model_id):
+    # Leading number in the size string, in billions of parameters (e.g. "30B-A3B"
+    # -> 30, "106-A12B" -> 106, "E2B" -> 2). Used to find the smallest/largest model.
+    match = re.search(r"(\d+(?:\.\d+)?)", models_lookup[model_id]["size"])
+    return float(match.group(1)) if match else float("nan")
+
 def lr_visualize_all_models(family):
     models_to_plot = [model_id for model_id, info in models_lookup.items() if info["family"] == family]
     plots_dir = PLOTS_DIR / family
@@ -102,6 +109,7 @@ def lr_visualize_all_models(family):
 
     fig, ax = plt.subplots(figsize=(10, 5))
 
+    model_curves = {}
     for model_id in models_to_plot:
         model_dir = MODELS_DIR / model_id
         title = models_lookup[model_id]["title"]
@@ -109,15 +117,36 @@ def lr_visualize_all_models(family):
         results_dir = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/decoding")
         main_accuracy_df = pd.read_csv(results_dir / "layerwise_accuracy.csv")
         normalized_layers = get_normalized_layers(main_accuracy_df["layer_index"])
+        model_curves[model_id] = (normalized_layers, main_accuracy_df["all_accuracy"])
         ax.plot(
-            normalized_layers, 
-            main_accuracy_df["all_accuracy"], 
-            markersize=12, 
-            linewidth=4, 
-            marker=None, 
-            color=color, 
+            normalized_layers,
+            main_accuracy_df["all_accuracy"],
+            markersize=12,
+            linewidth=4,
+            marker=None,
+            color=color,
             label=title,
         )
+
+    # Mark the peak decoding accuracy of the smallest and largest models in the
+    # family with a star (face colored like the model's line, outlined in black).
+    if models_to_plot:
+        models_by_size = sorted(models_to_plot, key=get_params_b)
+        smallest_id, largest_id = models_by_size[0], models_by_size[-1]
+        # for extreme_id in {smallest_id, largest_id}:
+        #     normalized_layers, accuracy = model_curves[extreme_id]
+        #     peak_idx = accuracy.idxmax()
+        #     ax.scatter(
+        #         normalized_layers.loc[peak_idx],
+        #         accuracy.loc[peak_idx],
+        #         marker="*",
+        #         s=700,
+        #         color=models_lookup[extreme_id]["color"],
+        #         edgecolors="black",
+        #         linewidths=1.5,
+        #         zorder=5,
+        #     )
+
     try:
         average_threshold = average_significance_threshold(family)
         ax.axhline(
@@ -131,11 +160,11 @@ def lr_visualize_all_models(family):
     except:
         pass
 
-    ax.set_xlabel("Normalized layer", fontsize=24)
+    ax.set_xlabel("Normalized layer depth", fontsize=24)
     ax.set_ylabel("Decoding accuracy", fontsize=24)
     ax.set_xlim(0, 1)
     ax.set_xticks(np.linspace(0, 1, 6))
-    ax.set_ylim(0.45, 1.0)
+    ax.set_ylim(0.47, 1)
     ax.tick_params(
         axis="both",
         labelsize=22,
@@ -152,19 +181,25 @@ def lr_visualize_all_models(family):
         alpha=0.3,
     )
 
-    ax.legend(
-        fontsize=17,
-        ncol=1,
-        framealpha=0.9,
-        loc="lower right",
-    )
+    # ax.legend(
+    #     fontsize=17,
+    #     ncol=1,
+    #     framealpha=0.9,
+    #     loc="lower right",
+    # )
     fig.tight_layout()
 
+    # fig.savefig(
+    #     plots_dir / f"all_{family}.pdf",
+    #     bbox_inches="tight",
+    # )
     fig.savefig(
-        plots_dir / f"all_{family}.pdf",
+        plots_dir / f"all_{family}.png",
         bbox_inches="tight",
+        dpi=600,
     )
 
     plt.close(fig)
 
 
+lr_visualize_all_models("intern")

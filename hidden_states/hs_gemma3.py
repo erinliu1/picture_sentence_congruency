@@ -51,9 +51,25 @@ GEMMA3_DENSE_LOOKUP = {
     "gemma3_27b": "google/gemma-3-27b-it",
 }
 
+# Base (pretrained, non-instruction-tuned) counterparts -- "-pt" checkpoints. These ship with no
+# chat template (there's no user/model turn structure to apply), so prompts are built as plain
+# "<start_of_image> {sentence}" text handed straight to the processor instead of through
+# apply_chat_template -- this is the usage pattern documented on the -pt model cards.
+GEMMA3_BASE_LOOKUP = {
+    "gemma3_4b_base": "google/gemma-3-4b-pt",
+    "gemma3_12b_base": "google/gemma-3-12b-pt",
+    "gemma3_27b_base": "google/gemma-3-27b-pt",
+}
+
 def extract_hidden_states(model_id):
     if model_id in GEMMA3_DENSE_LOOKUP:
         model_name = GEMMA3_DENSE_LOOKUP[model_id]
+        is_base = False
+        dtype = torch.bfloat16
+        device_map = {"": 0}
+    elif model_id in GEMMA3_BASE_LOOKUP:
+        model_name = GEMMA3_BASE_LOOKUP[model_id]
+        is_base = True
         dtype = torch.bfloat16
         device_map = {"": 0}
     else:
@@ -91,28 +107,32 @@ def extract_hidden_states(model_id):
             image_path = PICTURES_DIR / f"{image_word}.png"
             image = Image.open(image_path).convert("RGB")
 
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": image,
-                        },
-                        {
-                            "type": "text",
-                            "text": sentence,
-                        },
-                    ],
-                }
-            ]
-            inputs = processor.apply_chat_template(
-                messages,
-                tokenize=True,
-                add_generation_prompt=False,
-                return_dict=True,
-                return_tensors="pt",
-            )
+            if is_base:
+                prompt = f"<start_of_image> {sentence}"
+                inputs = processor(text=prompt, images=image, return_tensors="pt")
+            else:
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "image": image,
+                            },
+                            {
+                                "type": "text",
+                                "text": sentence,
+                            },
+                        ],
+                    }
+                ]
+                inputs = processor.apply_chat_template(
+                    messages,
+                    tokenize=True,
+                    add_generation_prompt=False,
+                    return_dict=True,
+                    return_tensors="pt",
+                )
 
             token_ids = inputs["input_ids"][0]
             period_index = (token_ids == PERIOD_TOKEN_ID).nonzero(as_tuple=True)[0][-1].item()

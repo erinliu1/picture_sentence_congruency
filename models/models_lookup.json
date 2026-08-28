@@ -36,7 +36,7 @@
     },
     "qwen3_vl_235b_a22b_instruct": {
         "title": "Qwen3-VL-235B-A22B-Instruct",
-        "color": "#000000",
+        "color": "#365314",
         "family": "qwen",
         "type": "moe",
         "size": "235B-A22B"
@@ -80,6 +80,48 @@
         "title": "InternVL3-78B-Instruct",
         "color": "#1E3A8A",
         "family": "intern",
+        "type": "dense",
+        "size": "78B"
+    },
+    "internvl3_1b_base": {
+        "title": "InternVL3-1B-Base",
+        "color": "#E5E7EB",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "1B"
+    },
+    "internvl3_2b_base": {
+        "title": "InternVL3-2B-Base",
+        "color": "#D1D5DB",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "2B"
+    },
+    "internvl3_8b_base": {
+        "title": "InternVL3-8B-Base",
+        "color": "#9CA3AF",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "8B"
+    },
+    "internvl3_14b_base": {
+        "title": "InternVL3-14B-Base",
+        "color": "#6B7280",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "14B"
+    },
+    "internvl3_38b_base": {
+        "title": "InternVL3-38B-Base",
+        "color": "#4B5563",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "38B"
+    },
+    "internvl3_78b_base": {
+        "title": "InternVL3-78B-Base",
+        "color": "#1F2937",
+        "family": "intern_base",
         "type": "dense",
         "size": "78B"
     },
@@ -160,6 +202,27 @@
         "type": "dense",
         "size": "27B"
     },
+    "gemma3_4b_base": {
+        "title": "Gemma3-4B-Base",
+        "color": "#9CA3AF",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "4B"
+    },
+    "gemma3_12b_base": {
+        "title": "Gemma3-12B-Base",
+        "color": "#6B7280",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "12B"
+    },
+    "gemma3_27b_base": {
+        "title": "Gemma3-27B-Base",
+        "color": "#374151",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "27B"
+    },
     "gemma4_e2b": {
         "title": "Gemma4-E2B",
         "color": "#FFEDD5",
@@ -192,6 +255,41 @@
         "title": "Gemma4-31B",
         "color": "#7C2D12",
         "family": "gemma4",
+        "type": "dense",
+        "size": "31B"
+    },
+    "gemma4_e2b_base": {
+        "title": "Gemma4-E2B-Base",
+        "color": "#D1D5DB",
+        "family": "gemma4_base",
+        "type": "PLE",
+        "size": "E2B"
+    },
+    "gemma4_e4b_base": {
+        "title": "Gemma4-E4B-Base",
+        "color": "#9CA3AF",
+        "family": "gemma4_base",
+        "type": "PLE",
+        "size": "E4B"
+    },
+    "gemma4_12b_base": {
+        "title": "Gemma4-12B-Base",
+        "color": "#6B7280",
+        "family": "gemma4_base",
+        "type": "dense",
+        "size": "12B"
+    },
+    "gemma4_26b_a4b_base": {
+        "title": "Gemma4-26B-A4B-Base",
+        "color": "#4B5563",
+        "family": "gemma4_base",
+        "type": "moe",
+        "size": "26B-A4B"
+    },
+    "gemma4_31b_base": {
+        "title": "Gemma4-31B-Base",
+        "color": "#1F2937",
+        "family": "gemma4_base",
         "type": "dense",
         "size": "31B"
     }

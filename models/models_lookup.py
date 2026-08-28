@@ -88,6 +88,55 @@ models_lookup = {
         "size": "78B",
     },
 
+    # Base (pretrained, non-instruction-tuned) counterparts of internvl3_{1b,2b,8b,14b,38b,78b}, the
+    # OpenGVLab/InternVL3-{size}-Pretrained checkpoints. Unlike the "-hf" instruct checkpoints (which use
+    # transformers-native InternVLForConditionalGeneration + AutoProcessor), these ship only in OpenGVLab's
+    # original custom-code format (InternVLChatModel via trust_remote_code=True), so hidden-state extraction
+    # for this family follows a different code path (see hs_intern.py). Kept in a separate "intern_base"
+    # family for the same reason as gemma3_base/gemma4_base.
+    'internvl3_1b_base': {
+        "title": "InternVL3-1B-Base",
+        "color": "#E5E7EB",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "1B",
+    },
+    'internvl3_2b_base': {
+        "title": "InternVL3-2B-Base",
+        "color": "#D1D5DB",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "2B",
+    },
+    'internvl3_8b_base': {
+        "title": "InternVL3-8B-Base",
+        "color": "#9CA3AF",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "8B",
+    },
+    'internvl3_14b_base': {
+        "title": "InternVL3-14B-Base",
+        "color": "#6B7280",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "14B",
+    },
+    'internvl3_38b_base': {
+        "title": "InternVL3-38B-Base",
+        "color": "#4B5563",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "38B",
+    },
+    'internvl3_78b_base': {
+        "title": "InternVL3-78B-Base",
+        "color": "#1F2937",
+        "family": "intern_base",
+        "type": "dense",
+        "size": "78B",
+    },
+
     'plm_1b': {
         "title": "PLM-1B",
         "color": "#DDD6FE",
@@ -166,6 +215,32 @@ models_lookup = {
         "size": "27B",
     },
 
+    # Base (pretrained, non-instruction-tuned) counterparts of gemma3_{4b,12b,27b}, the
+    # google/gemma-3-{4b,12b,27b}-pt checkpoints. Kept in a separate "gemma3_base" family
+    # (rather than folded into "gemma3") so existing gemma3-family aggregate plots/scripts
+    # aren't silently changed by an untuned model.
+    'gemma3_4b_base': {
+        "title": "Gemma3-4B-Base",
+        "color": "#9CA3AF",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "4B",
+    },
+    'gemma3_12b_base': {
+        "title": "Gemma3-12B-Base",
+        "color": "#6B7280",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "12B",
+    },
+    'gemma3_27b_base': {
+        "title": "Gemma3-27B-Base",
+        "color": "#374151",
+        "family": "gemma3_base",
+        "type": "dense",
+        "size": "27B",
+    },
+
     'gemma4_e2b': {
         "title": "Gemma4-E2B",
         "color": "#FFEDD5",
@@ -198,6 +273,46 @@ models_lookup = {
         "title": "Gemma4-31B",
         "color": "#7C2D12",
         "family": "gemma4",
+        "type": "dense",
+        "size": "31B",
+    },
+
+    # Base (pretrained, non-instruction-tuned) counterparts of gemma4_{e2b,e4b,12b,26b_a4b,31b},
+    # the google/gemma-4-{E2B,E4B,12B,26B-A4B,31B} checkpoints (no "-it" suffix). Kept in a
+    # separate "gemma4_base" family for the same reason as gemma3_base: so existing gemma4-family
+    # aggregate plots/scripts aren't silently changed by an untuned model.
+    'gemma4_e2b_base': {
+        "title": "Gemma4-E2B-Base",
+        "color": "#D1D5DB",
+        "family": "gemma4_base",
+        "type": "PLE",
+        "size": "E2B",
+    },
+    'gemma4_e4b_base': {
+        "title": "Gemma4-E4B-Base",
+        "color": "#9CA3AF",
+        "family": "gemma4_base",
+        "type": "PLE",
+        "size": "E4B",
+    },
+    'gemma4_12b_base': {
+        "title": "Gemma4-12B-Base",
+        "color": "#6B7280",
+        "family": "gemma4_base",
+        "type": "dense",
+        "size": "12B",
+    },
+    'gemma4_26b_a4b_base': {
+        "title": "Gemma4-26B-A4B-Base",
+        "color": "#4B5563",
+        "family": "gemma4_base",
+        "type": "moe",
+        "size": "26B-A4B",
+    },
+    'gemma4_31b_base': {
+        "title": "Gemma4-31B-Base",
+        "color": "#1F2937",
+        "family": "gemma4_base",
         "type": "dense",
         "size": "31B",
     },
