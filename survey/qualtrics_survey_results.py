@@ -7,7 +7,7 @@ import pandas as pd
 from glob import glob
 
 SURVEY_DIR = Path("/Intern/Erin/picture_sentence_congruency/survey")
-OUTPUT_PATH = SURVEY_DIR / "results" / "behavior_human.csv"
+OUTPUT_PATH = SURVEY_DIR / "results" / "ratings.csv"
 
 all_survey_results = []
 for survey_ID in ['A', 'B', 'C', 'D']:

@@ -1,95 +1,138 @@
-## What this is
+# Picture–sentence congruency
 
-A research pipeline studying picture-sentence congruency judgments: for 80 sentence-frame stimuli, each
-paired with one of two possible final words and one of two possible pictures, the project compares human
-survey ratings against Qwen3-VL vision-language models' behavioral ratings and internal hidden-state
-representations.
+A research pipeline comparing human and vision-language model (VLM) judgments of picture–sentence compatibility, decoding congruency from model representations, and relating that internal signal to the models' explicit judgments.
 
-There is no package manifest, test suite, linter, or build system — this is a flat collection of analysis
-scripts run manually, stage by stage.
+This is a collection of Python scripts run stage by stage. There is no package manifest, automated test suite, linter, build system, or unified command-line interface.
 
-## Environment
+## Experimental design
 
-- Python 3.12 venv at `.venv` (created with `--system-site-packages`, so most heavy deps like `torch` /
-  `transformers` resolve from the system site-packages, not from `.venv` itself).
-- Secrets/config live in `.env` (`PRIME_API_KEY`, `HF_TOKEN`, `QUALTRICS_API_TOKEN`, `QUALTRICS_DATACENTER`,
-  plus CUDA path overrides) and are loaded via `python-dotenv`'s `load_dotenv()` at the top of scripts that
-  need them.
-- GPU-touching scripts (`hidden_states/hs_qwen.py`, `behavioral/behavioral_qwen.py`) must call
-  `prepare_cuda()` (from the local `prepare_cuda.py`, duplicated in both `hidden_states/` and `behavioral/`)
-  **before torch is imported anywhere** — it sets `CUDA_HOME`/`LD_LIBRARY_PATH`/etc. and restricts to a
-  single physical GPU unless `allow_multi_gpu=True` is passed (needed for models sharded with
-  `device_map="auto"`).
-- Every script hardcodes absolute paths rooted at `/Intern/Erin/picture_sentence_congruency/...` rather than
-  using paths relative to the file — the repo is assumed to live at exactly this location.
-- Scripts use flat local imports (e.g. `from behavioral_qwen import extract_ratings`) with no package
-  `__init__.py`, so each script must be run with its own subdirectory as the working directory.
+`stimuli/sentences.py` defines 80 sentence frames, each with two possible final words, and exports `stimuli/sentences.json`. Pictures in `stimuli/pictures/` are named after the words they depict.
 
-## Running the pipeline
+Each item produces four picture–sentence combinations: two matching (congruent) and two mismatching (incongruent), for 320 examples per model. For example, “She needed to put everything in the” has endings `library` and `refrigerator`, each paired with both pictures. Congruency is the experimental label defined by whether the picture word equals the final word; compatibility is the graded 1–5 judgment collected from humans or models.
 
-There's no CLI; each stage's `*_main.py` is a driver script meant to be hand-edited (which `model_id`s to
-run, how many permutations, etc.) and then executed directly:
+Four counterbalanced Qualtrics surveys (A–D) each contain one example from every item: 40 congruent and 40 incongruent. Across surveys, each item's four combinations appear exactly once. The current local `survey/results/ratings.csv` contains 5,090 individual ratings from 67 participant IDs, covering all 320 combinations. These counts describe the current data rather than requirements for future collections.
 
-```bash
-source .venv/bin/activate
+## Models and outputs
 
-cd stimuli && python sentences.py          # (re)generate stimuli/sentences.json from the `sentences` list
-cd models && python models_lookup.py       # (re)generate models/models_lookup.json from the `models_lookup` dict
+`models/models_lookup.py` exports `models/models_lookup.json`, the shared registry of model IDs, titles, plotting colors, families, architecture types, and sizes. It currently lists 42 variants:
 
-cd hidden_states && python hs_qwen.py      # extract per-layer hidden states (edit model_id at call site)
-cd behavioral && python behavioral_main.py # get VLM ratings + accuracy/correlation/health analysis
-cd decoding && python lr_cv.py             # (re)generate CV fold splits in decoding/cv/
-cd decoding && python lr_main.py           # train/bootstrap/permute/significance-test/plot decoding
-cd alignment && python alignment_main.py   # regress human ratings on decoder congruent-probability
-cd confidence && python confidence_VLM.py  # confidence/probability-mass plots
-cd confidence && python confidence_humans.py
+| Family | Variants | Coverage |
+| --- | ---: | --- |
+| Qwen3-VL | 6 | Instruction-tuned dense and MoE models |
+| InternVL3 | 12 | Six instruction-tuned and six base models |
+| Perception-LM (PLM) | 3 | Model size |
+| LLaVA-OneVision | 3 | Model size |
+| GLM-4.6V | 2 | Dense and MoE models |
+| Gemma3 | 6 | Three instruction-tuned and three base models |
+| Gemma4 | 10 | Five instruction-tuned and five base models |
+
+The current local output tree has hidden-state directories and decoding results for all 42 variants, and behavioral ratings and alignment coefficients for 28. Base variants currently have representation analyses but no behavioral rating outputs. File presence does not establish completeness or reliability. Aggregate tables may cover fewer models if they have not been regenerated.
+
+Stages share the key `(item_index, image_word, condition)`. Per-model outputs live under `models/{model_id}/`; aggregate tables and figures generally live in each analysis directory's `results/` and `plots/` subdirectories.
+
+## Pipeline
+
+### Human survey
+
+`survey/qualtrics_survey_assignment.py` builds and verifies counterbalanced assignments. `qualtrics_upload_images.py` and `qualtrics_generate_survey.py` support image upload and survey `.qsf` generation. `qualtrics_survey_results.py` parses response CSVs into participant-level ratings.
+
+The parser writes `survey/results/ratings.csv`, the shared human-rating input used by downstream analyses. Human comparisons average ratings by the shared stimulus key.
+
+### Behavioral judgments
+
+`behavioral/behavioral_{qwen,intern,plm,llava,glm,gemma3,gemma4}.py` implement model-specific extraction. Models receive a picture, sentence, and compatibility instructions using a 1–5 scale. Ratings are expectations over probabilities normalized across the five rating-digit tokens, rather than parsed free-text responses. Some families use additional generation or answer-position handling; `qwen_big.py` and `glm_big.py` provide separate large-model workflows.
+
+`models/{model_id}/behavior/ratings.csv` includes the expected `rating`, most likely digit (`top_one_token`), probabilities `p1`–`p5`, `max_probability`, and `total_probability_mass` on rating digits in the full-vocabulary distribution. The last field checks whether valid answers receive probability even when the normalized five-digit distribution looks confident.
+
+Analyses include:
+
+- `behavioral_accuracy.py`: classify `rating > 3` as congruent and `rating <= 3` as incongruent; report overall and condition-specific accuracy and confusion matrices.
+- `behavioral_correlation.py`: Spearman correlation with mean human ratings and 10,000 item-resampling bootstrap confidence intervals.
+- `behavioral_health.py`: rating distributions and per-model summaries.
+- `behavioral_concordance.py`: within-item comparisons of congruent against incongruent ratings.
+- `behavioral_grounding.py`: correlation between ratings for the same final word under matching and mismatching pictures, used as a grounding diagnostic.
+- `behavioral_instruction.py`: mean and minimum probability mass assigned to valid rating tokens.
+
+### Hidden-state extraction
+
+`hidden_states/hs_{qwen,intern,plm,llava,glm,gemma3,gemma4}.py` feed each picture–sentence pair to its model **without the behavioral rating instruction**. They locate the last period token and extract the preceding token's representation, intended to be the final token of the critical word. Tokenization must preserve that assumption.
+
+Each example is saved as `models/{model_id}/hidden_states/{item_index}_{image_word}_{condition}.pt`: a CPU float32 tensor of shape `(number_of_layers, hidden_size)`, excluding the embedding state. Extraction and behavioral prompting are separate forward passes with different inputs.
+
+### Layerwise decoding
+
+`decoding/lr_cv.py` creates reproducible 10-fold splits of the 80 items (seed 42) in `decoding/cv/`. All four examples of an item stay together, so its sentence frame cannot occur in both training and test sets. Each fold uses 72 training items (288 examples) and eight test items (32 examples).
+
+`lr_train.py` fits a separate `StandardScaler` plus logistic regression at each layer and fold (`C=0.01`, `solver="liblinear"`, `max_iter=10000`). Scaling is fitted on training data. Congruent is label 1. Held-out predictions produce per-model `decoding/results.csv`, including `probability_congruent`, and `decoding/layerwise_accuracy.csv`.
+
+`lr_bootstrap.py` resamples whole items 10,000 times to estimate accuracy uncertainty without retraining. `lr_permutation.py` independently flips each item's labels with probability 0.5 and retrains all fold/layer classifiers. It checkpoints each permutation and saves layerwise null accuracies plus the maximum accuracy across layers for each permutation. `lr_significance.py` compares observed accuracies with this maximum-statistic null distribution to account for testing multiple layers within a model.
+
+Plotting and summary scripts compare layer trajectories, model sizes, and base versus instruction-tuned variants.
+
+### Representation–behavior alignment
+
+`alignment/alignment_rep_bev.py` joins held-out decoder probabilities with **the same model's behavioral ratings**, not human ratings. At each layer it standardizes the congruent probability and fits:
+
+```text
+rating ~ probability_z + C(item_index)
 ```
 
-Survey generation/ingestion (`survey/qualtrics_generate_survey.py`,
-`survey/qualtrics_survey_assignment.py`, `survey/qualtrics_upload_images.py`,
-`survey/qualtrics_survey_results.py`) is a separate, mostly one-shot flow for building the Qualtrics `.qsf`
-survey files, assigning stimuli to survey versions A–D, and parsing raw Qualtrics response CSVs down into
-`survey/results/ratings.csv` — the human ground-truth ratings every other stage joins against.
+The OLS model includes item fixed effects and standard errors clustered by item. Benjamini–Hochberg FDR correction is applied across layers within each model. Results are saved to `models/{model_id}/alignment/coefficients.csv`. This measures whether the linearly decodable congruency signal tracks the model's own explicit graded judgments. Human-rating input is commented out in the current implementation.
 
-## Pipeline architecture
+`alignment_main.py` produces per-model plots and an aggregate summary of peak and final-layer coefficients. Pair-generation and visualization scripts inspect selected model comparisons.
 
-The stages run in this dependency order, each writing into `models/{model_id}/<stage>/`:
+### Confidence
 
-1. **`stimuli/`** — `sentences.py` is the source of truth for the 80 experimental items (sentence frame +
-   two candidate final words); it exports `sentences.json`. `stimuli/pictures/*.png` are named after the
-   words they depict (one picture per word).
-2. **`survey/`** → **`survey/results/ratings.csv`** — human congruency ratings (1–5) per
-   `(item_index, image_word, condition)`, the ground truth used by `behavioral/`, `alignment/`, and
-   `confidence/confidence_humans.py`.
-3. **`models/models_lookup.json`** — the central `model_id -> {title, color}` registry every downstream
-   script reads to know which models exist and how to label/color their plots.
-4. **`hidden_states/hs_qwen.py`** — loads a Qwen3-VL model, feeds it each (picture, sentence) pair, and
-   saves the last-token-before-period hidden state at every layer as one `.pt` tensor per stimulus/condition
-   into `models/{model_id}/hidden_states/`.
-5. **`behavioral/behavioral_qwen.py`** — prompts the same models for a 1–5 compatibility rating, computed as
-   the probability-weighted expectation over the digit tokens' next-token logits (not free-text generation);
-   saves `models/{model_id}/behavior/ratings.csv`. `behavioral_accuracy.py` / `behavioral_correlation.py` /
-   `behavioral_health.py` compare these against human ratings.
-6. **`decoding/`** — `lr_cv.py` builds 10-fold, item-level (not row-level) cross-validation splits over the
-   80 stimuli. `lr_train.py` trains one logistic-regression classifier per layer per fold to decode
-   congruent-vs-incongruent from the layer's hidden state, producing per-item predicted probabilities in
-   `models/{model_id}/decoding/results.csv` and `layerwise_accuracy.csv`. `lr_bootstrap.py` /
-   `lr_permutation.py` / `lr_significance.py` establish statistical significance of layerwise accuracy;
-   `lr_visualize.py` plots it.
-7. **`alignment/alignment_rep_bev.py`** — per layer, regresses human ratings on the decoder's (z-scored)
-   congruent-probability via OLS with item-clustered SEs and BH-FDR correction across layers, to test
-   whether the linearly-decodable congruency signal in the model's representations tracks human graded
-   judgments; `alignment_visualize.py` plots the resulting coefficients.
-8. **`confidence/`** — separate look at rating *confidence* (distance from the scale midpoint / max softmax
-   probability) rather than accuracy, for humans and VLMs respectively.
+`confidence/confidence_VLM.py` plots maximum probability within the normalized five-digit distribution, separated by congruency condition. `confidence_humans.py` plots signed `rating - 3`, reversing the sign for incongruent examples: positive values support the assigned condition, negative values oppose it.
+
+## Environment and execution
+
+- The local Python 3.12 virtual environment is `.venv`, created with `--system-site-packages`. Heavy dependencies such as PyTorch and Transformers may resolve from system packages. Other dependencies include pandas, NumPy, Pillow, scikit-learn, SciPy, statsmodels, matplotlib, tqdm, and python-dotenv. Model-specific dependencies and memory requirements vary.
+- `.env` holds credentials and configuration for services, model access, and CUDA overrides. Scripts that need it use `load_dotenv()`; it is excluded from Git.
+- Paths are generally hardcoded under `/Intern/Erin/picture_sentence_congruency`.
+- Drivers use flat sibling imports. Run them from their own stage directory.
+- The duplicated `prepare_cuda.py` helpers in `behavioral/` and `hidden_states/` configure CUDA. With `allow_multi_gpu=False`, the helper selects the physical GPU with the most free memory. Multi-GPU workflows preserve configured visibility and use sharding such as `device_map="auto"`. Call the helper before importing PyTorch when configuring new GPU workflows; some existing scripts currently import PyTorch earlier. Check script-specific GPU settings before launching.
+- Several scripts execute work at import time. In particular, `hs_qwen.py` directly launches extraction for the 235B model. Inspect call sites before running or importing extraction scripts.
+
+From the repository root:
+
+```bash
+mkdir -p /Intern/Erin/tmp
+export TMPDIR=/Intern/Erin/tmp TMP=/Intern/Erin/tmp TEMP=/Intern/Erin/tmp
+source .venv/bin/activate
+```
+
+Run stages individually from the root:
+
+```bash
+(cd stimuli && python sentences.py)        # regenerate stimuli JSON, if needed
+(cd models && python models_lookup.py)     # regenerate registry, if needed
+(cd hidden_states && python hs_main.py)    # after selecting family/models
+(cd behavioral && python behavioral_main.py)  # after restoring extractor import
+(cd decoding && python lr_cv.py)           # regenerate item splits, if needed
+(cd decoding && python lr_main.py)         # after enabling required stages/models
+(cd alignment && python alignment_main.py) # requires decoding and behavioral outputs
+(cd confidence && python confidence_VLM.py)
+(cd confidence && python confidence_humans.py)
+```
+
+These commands are a workflow guide, not an unattended end-to-end runner. The current drivers need manual configuration:
+
+- `hs_main.py` imports the Gemma4 extractor and selects family `gemma4`.
+- `behavioral_main.py` selects Qwen models, but all `extract_ratings` imports are commented out. Restore the matching import before extracting ratings. Otherwise, its caught error skips per-model work and proceeds to aggregate analyses of existing files.
+- `lr_main.py` selects the large GLM and Qwen MoE models for 1,000 permutations, significance testing, and plots; training and bootstrapping are commented out. Enable them when their outputs are missing.
+- `alignment_main.py` iterates over the full registry without skipping missing behavioral files. Restrict it to models with both behavioral and decoding results before running it on the current tree.
+
+Some decoding stages skip work when output files exist, and permutation runs reuse seed checkpoints. When inputs or settings change, deliberately invalidate the relevant outputs before recomputation. The permutation runner currently requests 70 worker processes; adjust this to available CPU and memory resources.
+
+## Reliability notes
+
+`notes/` contains diagnostics and appendices for large GLM behavioral extraction. In particular, `appendix_glm46v_4gpu_reliability.md` documents NaN logits and unreliable answers in tested sharded GLM-4.6V configurations. Those notes do not establish a confirmed root cause or validate all saved GLM outputs. Consult the diagnostics before interpreting or reporting behavioral results from affected configurations. Large Qwen workflows also have script-specific multi-GPU handling and reliability comments.
 
 ## Naming conventions
 
-- **`model_id`** strings (e.g. `qwen3_vl_30b_a3b_instruct`) key `models_lookup.json` and the
-  `models/{model_id}/` output tree; dense variants (2b/4b/8b/32b) use `Qwen3VLForConditionalGeneration`,
-  MoE variants (30b-a3b) use `Qwen3VLMoeForConditionalGeneration`. All models use a single GPU.
-- **Hidden-state / stimulus filenames**: `{item_index}_{image_word}_{condition}.pt`, where `item_index` is
-  the 0-based index into `sentences.json`, `image_word` is whichever of the item's two `word_options` was
-  paired with the picture, and `condition` is `congruent` (image word == sentence's final word) or
-  `incongruent` (they differ). This same triple (`item_index`, `image_word`, `condition`) is the join key
-  used everywhere results are merged with human ratings.
+- `model_id` keys the registry and the `models/{model_id}/` directory.
+- `item_index` is the zero-based position in `stimuli/sentences.json`.
+- `image_word` identifies the picture; `condition` is `congruent` or `incongruent`.
+- Given an item's two endings, `image_word` and `condition` uniquely identify the final word, so it need not appear separately in the shared join key or hidden-state filename.
+- Layer indices in decoding outputs are zero-based indices into the saved layer tensor; embedding states are excluded.
