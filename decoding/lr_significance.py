@@ -8,10 +8,9 @@ MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
 with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
     models_lookup = json.load(file)
 
-def lr_significance(model_id):
-    models_dir = MODELS_DIR / model_id
-    
-    results_dir = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/decoding")
+def lr_significance(model_id, instructions=False):
+    decoding_folder = "decoding_instruction" if instructions else "decoding"
+    results_dir = MODELS_DIR / model_id / decoding_folder
     output_path = results_dir / "layerwise_significance.csv"
 
     if output_path.exists():

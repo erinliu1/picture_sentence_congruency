@@ -45,9 +45,10 @@ def per_item_correct_counts(results_df):
 
     return layers, congruent_correct, incongruent_correct
 
-def lr_bootstrap(model_id):
+def lr_bootstrap(model_id, instructions=False):
     model_dir = MODELS_DIR / model_id
-    results_dir = model_dir / "decoding"
+    decoding_folder = "decoding_instruction" if instructions else "decoding"
+    results_dir = model_dir / decoding_folder
     classifier_results_df = pd.read_csv(results_dir / "results.csv")
     
     if (results_dir / 'all_bootstraps.csv').exists():

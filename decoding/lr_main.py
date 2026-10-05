@@ -1,26 +1,10 @@
 from lr_train import lr_train
 from lr_bootstrap import lr_bootstrap
-from lr_permutation import run_all_permutations
-from lr_significance import lr_significance
-from lr_visualize import lr_visualize, lr_visualize_all_models
-from lr_summarize import lr_summarize
+from visualize_instruction_comparison import plot_instruction_comparison
 
-from pathlib import Path
-import json
-MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
-with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
-    models_lookup = json.load(file)
 
-for model_id in models_lookup.keys():
-    # if models_lookup[model_id]["family"] in ["gemma3", "gemma4"]:
-    if model_id in ["glm_106b_a12b", "qwen3_vl_235b_a22b_instruct"]:
-        # lr_train(model_id)
-        # lr_bootstrap(model_id)
-        run_all_permutations(model_id, n_permutations=1000)
-        lr_significance(model_id)
-        lr_visualize(model_id)
-        print('✅')
-
-lr_visualize_all_models("glm")
-lr_visualize_all_models("qwen")
-# lr_summarize()
+if __name__ == "__main__":
+    for model_id in ("gemma3_12b", "gemma3_27b"):
+        lr_train(model_id, instructions=True)
+        lr_bootstrap(model_id, instructions=True)
+        plot_instruction_comparison(model_id)

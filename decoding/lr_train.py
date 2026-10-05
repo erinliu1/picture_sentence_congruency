@@ -73,15 +73,18 @@ def compute_layerwise_accuracy(results_df):
     return pd.DataFrame(layerwise_accuracy)
 
 # no label reversal for the real (non-permuted) run
-def lr_train(model_id, reverse_indices=[]):
+def lr_train(model_id, reverse_indices=[], instructions=False):
+    """Decode congruency from critical-word or instruction-conditioned hidden states."""
     model_dir = MODELS_DIR / model_id
-    hidden_states_dir = model_dir / "hidden_states"
+    hidden_states_folder = "hidden_states_instruction" if instructions else "hidden_states"
+    decoding_folder = "decoding_instruction" if instructions else "decoding"
+    hidden_states_dir = model_dir / hidden_states_folder
 
-    output_dir = model_dir / "decoding"
+    output_dir = model_dir / decoding_folder
     output_dir.mkdir(exist_ok=True)
 
     if (output_dir / 'results.csv').exists() and (output_dir / 'layerwise_accuracy.csv').exists():
-        print(f"Decoding results already exist for {model_id}, skipping training.")
+        print(f"Decoding results already exist in {output_dir}, skipping training.")
         return
 
     title = models_lookup[model_id]["title"]

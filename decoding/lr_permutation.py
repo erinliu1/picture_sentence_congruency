@@ -150,13 +150,14 @@ def run_permutation(seed):
     accuracy_df.to_csv(checkpoint_path, index=False)
     return accuracy_df
 
-def run_all_permutations(model_id, n_permutations):
+def run_all_permutations(model_id, n_permutations, instructions=False):
     global PERMUTATIONS_DIR
 
     title = models_lookup[model_id]["title"]
     model_dir = MODELS_DIR / model_id
 
-    hidden_states_dir = model_dir / "hidden_states"
+    hidden_states_folder = "hidden_states_instruction" if instructions else "hidden_states"
+    hidden_states_dir = model_dir / hidden_states_folder
 
     ALL_HIDDEN_STATES.clear()
     for filename in os.listdir(hidden_states_dir):
@@ -171,7 +172,8 @@ def run_all_permutations(model_id, n_permutations):
             "test": build_fold_data(cv_lookup[str(fold)]["test"]),
         }
 
-    decoding_dir = model_dir / "decoding"
+    decoding_folder = "decoding_instruction" if instructions else "decoding"
+    decoding_dir = model_dir / decoding_folder
     decoding_dir.mkdir(exist_ok=True)
     PERMUTATIONS_DIR = str(decoding_dir / "permutations")
     os.makedirs(PERMUTATIONS_DIR, exist_ok=True)
