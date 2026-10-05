@@ -1,4 +1,4 @@
-"""Run each LLaVA model through extraction, decoding, and alignment in order."""
+"""Run each InternVL3 model through extraction, decoding, and alignment in order."""
 
 import json
 from pathlib import Path
@@ -10,10 +10,10 @@ if __name__ == "__main__":
     root = Path(__file__).resolve().parents[1]
     with (root / "models/models_lookup.json").open(encoding="utf-8") as file:
         registry = json.load(file)
-    model_ids = [model_id for model_id, info in registry.items() if info["family"] == "llava"]
+    model_ids = [model_id for model_id, info in registry.items() if info["family"] == "intern"]
     for model_id in model_ids:
         stages = [
-            ("extraction", "hidden_states", ["-c", f"from hs_llava import extract_hidden_states; extract_hidden_states({model_id!r}, instructions=True)"]),
+            ("extraction", "hidden_states", ["-c", f"from hs_intern import extract_hidden_states; extract_hidden_states({model_id!r}, instructions=True)"]),
             ("decoding", "decoding", ["lr_main.py", model_id]),
             ("alignment", "alignment", ["alignment_main.py", model_id]),
         ]

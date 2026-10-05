@@ -59,7 +59,7 @@ Analyses include:
 
 Each example is saved as `models/{model_id}/hidden_states/{item_index}_{image_word}_{condition}.pt`: a CPU float32 tensor of shape `(number_of_layers, hidden_size)`, excluding the embedding state. Extraction and behavioral prompting are separate forward passes with different inputs.
 
-Gemma3, Gemma4, and LLaVA also support `extract_hidden_states(model_id, instructions=True)`. This mode shares the exact behavioral rating prompt and chat-template construction, including `add_generation_prompt=True`, and extracts each layer at the final input position that predicts the first response token. No rating digit is appended. Tensors use the same format and filenames but are saved under `models/{model_id}/hidden_states_instruction/`. The default `instructions=False` retains critical-word extraction. For Gemma, instruction mode requires an instruction-tuned checkpoint. Existing decoding scripts still read `hidden_states/`; they do not automatically analyze these new tensors.
+Gemma3, Gemma4, LLaVA, and InternVL3 also support `extract_hidden_states(model_id, instructions=True)`. This mode shares the exact behavioral rating prompt and chat-template construction, including `add_generation_prompt=True`, and extracts each layer at the final input position that predicts the first response token. No rating digit is appended. Tensors use the same format and filenames but are saved under `models/{model_id}/hidden_states_instruction/`. The default `instructions=False` retains critical-word extraction. For Gemma and InternVL3, instruction mode requires an instruction-tuned checkpoint. Existing decoding scripts still read `hidden_states/`; they do not automatically analyze these new tensors.
 
 ### Layerwise decoding
 
@@ -120,7 +120,7 @@ Run stages individually from the root:
 
 These commands are a workflow guide, not an unattended end-to-end runner. The current drivers need manual configuration:
 
-- `hs_main.py` runs each model in the LLaVA family with `instructions=True`, completing extraction, `lr_main.py`, and `alignment_main.py` for that model before starting the next. Each stage runs in a separate process.
+- `hs_main.py` runs each instruction-tuned model in the InternVL3 (`intern`) family with `instructions=True`, completing extraction, `lr_main.py`, and `alignment_main.py` for that model before starting the next. Each stage runs in a separate process.
 - `behavioral_main.py` selects Qwen models, but all `extract_ratings` imports are commented out. Restore the matching import before extracting ratings. Otherwise, its caught error skips per-model work and proceeds to aggregate analyses of existing files.
 - `lr_main.py` trains and bootstraps instruction-conditioned decoding, then saves blue/pink comparison PNGs under `decoding/plots/{family}_instruction/`. Pass model IDs as arguments to process specific models; the default is all five instruction-tuned Gemma4 variants. It does not run permutations or significance testing.
 - `alignment_main.py` computes instruction-conditioned coefficients and final-layer pairs, then saves comparison PNGs under `alignment/plots/{family}_instruction/`. Pass model IDs as arguments; the default is all five instruction-tuned Gemma4 variants. It requires behavioral ratings, instruction decoding results, and original alignment coefficients for comparison.
