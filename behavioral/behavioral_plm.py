@@ -38,22 +38,7 @@ def resolve_model_name(model_id):
     local_path = Path(PLM_DENSE_LOOKUP[model_id]["local_path"])
     return str(local_path) if local_path.is_dir() else PLM_DENSE_LOOKUP[model_id]["hf_repo_id"]
 
-SYSTEM_PROMPT = """
-You will be shown one picture and one sentence. Your task is to judge how compatible the final word of the sentence is with the situation shown in the picture.
-
-When making your judgment:
-* Focus on the final word of the sentence. Treat the rest of the sentence as given.
-* The picture does not need to prove that the sentence ending is the only possible interpretation. Simply, decide whether the final word is a natural and reasonable interpretation of the picture.
-
-Use the following rating scale:
-1 - Not compatible at all. The final word is clearly inconsistent with / unrelated to / contradicts the picture.
-2 - Low compatibility. The final word is technically plausible but would not be commonly associated with the picture / it would be unusual or difficult to reconcile this sentence with the picture.
-3 - Uncertain. The final word provides weak / ambiguous / mixed evidence for the picture.
-4 - Compatible. The final word makes the sentence a reasonable interpretation of the picture.
-5 - Very compatible. The final word makes the sentence very consistent with / a natural interpretation of the picture.
-
-Respond with exactly one token: 1, 2, 3, 4, or 5. Do not output any additional text.
-""".strip()
+from plm_prompt import build_rating_inputs
 
 def extract_ratings(model_id):
     if model_id in PLM_DENSE_LOOKUP:
@@ -92,13 +77,6 @@ def extract_ratings(model_id):
             raise ValueError(f"expected a single token ID for the digit {rating!r}, but model gave {rating_ids}")
         RATING_TOKEN_IDS.append(rating_ids[0])
 
-    # PLM frequently ignores the "respond with exactly one token" instruction and starts a free-text
-    # reply (e.g. "She", "The", continuing/captioning the sentence) instead of a bare rating digit right
-    # after the chat template's generation prompt.
-    # Priming the assistant turn with the word "Rating: " before reading logits forces the model into the right format.
-    ASSISTANT_PREFIX = "Rating: "
-    ASSISTANT_PREFIX_IDS = processor.tokenizer.encode(ASSISTANT_PREFIX, add_special_tokens=False)
-
     expected_ratings = []
     for item_index, item in enumerate(tqdm(sentences, desc=f"Extracting ratings for {title}")):
         sentence_frame = item['sentence_frame']
@@ -114,40 +92,7 @@ def extract_ratings(model_id):
             image_path = PICTURES_DIR / f"{image_word}.png"
             image = Image.open(image_path).convert("RGB")
 
-            messages = [
-                # PLM's chat_template.jinja special-cases the system message as a plain string, unlike every other role
-                # (and all other models' system messages), which expect the structured content-list format.
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT,
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": image,
-                        },
-                        {
-                            "type": "text",
-                            "text": sentence,
-                        },
-                    ],
-                },
-            ]
-            inputs = processor.apply_chat_template(
-                messages,
-                tokenize=True,
-                add_generation_prompt=True,
-                return_dict=True,
-                return_tensors="pt",
-            )
-
-            prefix_ids = torch.tensor([ASSISTANT_PREFIX_IDS], dtype=inputs["input_ids"].dtype)
-            inputs["input_ids"] = torch.cat([inputs["input_ids"], prefix_ids], dim=1)
-            inputs["attention_mask"] = torch.cat(
-                [inputs["attention_mask"], torch.ones_like(prefix_ids)], dim=1
-            )
+            inputs = build_rating_inputs(processor, image, sentence)
 
             device = next(model.parameters()).device
             inputs = {k: v.to(device) for k, v in inputs.items()}

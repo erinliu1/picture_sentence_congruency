@@ -63,6 +63,8 @@ Gemma3, Gemma4, LLaVA, InternVL3, and Qwen3-VL also support `extract_hidden_stat
 
 GLM instruction extraction uses the behavioral generation call with `enable_thinking=False` and two generated tokens. It requires the first token to be `<|begin_of_box|>` and extracts generation step 1 hidden states at that box token, matching the position producing `gen.scores[1]` for the rating digit. Unexpected prefixes or nonfinite states stop extraction. Original critical-word extraction remains available with `instructions=False`. For `glm_106b_a12b`, set `GLM_HS_MULTI_GPU=1` and `CUDA_VISIBLE_DEVICES` to two idle GPU indices; the model is sharded across those two GPUs only. This model matches `behavioral/glm_big.py` by forcing the box marker then a rating digit, and additionally checks that raw rating logits are finite.
 
+PLM instruction extraction shares `behavioral/plm_prompt.py` with behavioral evaluation: the system content is a plain string, the assistant generation prompt is added, and separately tokenized `Rating: ` (including its trailing space) is appended to input IDs and attention mask. It extracts each layer at the final prefix token, matching behavioral `outputs.logits[0, -1]`, and saves to `hidden_states_instruction`. PLM models run sequentially on one GPU.
+
 ### Layerwise decoding
 
 `decoding/lr_cv.py` creates reproducible 10-fold splits of the 80 items (seed 42) in `decoding/cv/`. All four examples of an item stay together, so its sentence frame cannot occur in both training and test sets. Each fold uses 72 training items (288 examples) and eight test items (32 examples).
@@ -122,7 +124,7 @@ Run stages individually from the root:
 
 These commands are a workflow guide, not an unattended end-to-end runner. The current drivers need manual configuration:
 
-- `hs_main.py` defaults to `glm_106b_a12b` (or accepts GLM model IDs as command-line arguments) with `instructions=True`, completing extraction, `lr_main.py`, and `alignment_main.py` for that model before starting the next. Each stage runs in a separate process.
+- `hs_main.py` defaults to `plm_1b`, `plm_3b`, and `plm_8b` (or accepts PLM model IDs as command-line arguments) with `instructions=True`, completing extraction, `lr_main.py`, and `alignment_main.py` for that model before starting the next. Each stage runs in a separate process.
 - `behavioral_main.py` selects Qwen models, but all `extract_ratings` imports are commented out. Restore the matching import before extracting ratings. Otherwise, its caught error skips per-model work and proceeds to aggregate analyses of existing files.
 - `lr_main.py` trains and bootstraps instruction-conditioned decoding, then saves blue/pink comparison PNGs under `decoding/plots/{family}_instruction/`. Pass model IDs as arguments to process specific models; the default is all five instruction-tuned Gemma4 variants. It does not run permutations or significance testing.
 - `alignment_main.py` computes instruction-conditioned coefficients and final-layer pairs, then saves comparison PNGs under `alignment/plots/{family}_instruction/`. Pass model IDs as arguments; the default is all five instruction-tuned Gemma4 variants. It requires behavioral ratings, instruction decoding results, and original alignment coefficients for comparison.

@@ -8,7 +8,6 @@ import json
 import random
 
 import numpy as np
-import torch
 
 from pathlib import Path
 
@@ -17,6 +16,11 @@ load_dotenv()
 
 from prepare_cuda import prepare_cuda
 prepare_cuda(allow_multi_gpu=False)
+
+import torch
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "behavioral"))
+from plm_prompt import build_rating_inputs
 
 from PIL import Image
 from tqdm import tqdm
@@ -56,7 +60,8 @@ def resolve_model_name(model_id):
     local_path = Path(PLM_DENSE_LOOKUP[model_id]["local_path"])
     return str(local_path) if local_path.is_dir() else PLM_DENSE_LOOKUP[model_id]["hf_repo_id"]
 
-def extract_hidden_states(model_id):
+def extract_hidden_states(model_id, instructions=False):
+    """Extract critical-word states or final assistant-prefix states predicting ratings."""
     if model_id in PLM_DENSE_LOOKUP:
         model_class = PerceptionLMForConditionalGeneration
         model_name = resolve_model_name(model_id)
@@ -70,7 +75,8 @@ def extract_hidden_states(model_id):
         return
     title = models_lookup[model_id]["title"]
 
-    HIDDEN_STATES_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/hidden_states")
+    states_folder = "hidden_states_instruction" if instructions else "hidden_states"
+    HIDDEN_STATES_DIR = MODELS_DIR / model_id / states_folder
     HIDDEN_STATES_DIR.mkdir(parents=True, exist_ok=True)
 
     model = model_class.from_pretrained(
@@ -82,10 +88,11 @@ def extract_hidden_states(model_id):
     model.eval()
     processor = AutoProcessor.from_pretrained(model_name)
 
-    period_ids = processor.tokenizer.encode(".", add_special_tokens=False)
-    if len(period_ids) != 1:
-        raise ValueError(f"expected a single token ID for the period, but {model_id} gave {period_ids}")
-    PERIOD_TOKEN_ID = period_ids[0]
+    if not instructions:
+        period_ids = processor.tokenizer.encode(".", add_special_tokens=False)
+        if len(period_ids) != 1:
+            raise ValueError(f"expected a single token ID for the period, but {model_id} gave {period_ids}")
+        PERIOD_TOKEN_ID = period_ids[0]
 
     for item_index, item in enumerate(tqdm(sentences, desc=f"Extracting hidden states for {title}")):
         sentence_frame = item['sentence_frame']
@@ -101,32 +108,36 @@ def extract_hidden_states(model_id):
             image_path = PICTURES_DIR / f"{image_word}.png"
             image = Image.open(image_path).convert("RGB")
 
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": image,
-                        },
-                        {
-                            "type": "text",
-                            "text": sentence,
-                        },
-                    ],
-                }
-            ]
-            inputs = processor.apply_chat_template(
-                messages,
-                tokenize=True,
-                add_generation_prompt=False,
-                return_dict=True,
-                return_tensors="pt",
-            )
+            if instructions:
+                inputs = build_rating_inputs(processor, image, sentence)
+                extraction_index = -1
+            else:
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "image": image,
+                            },
+                            {
+                                "type": "text",
+                                "text": sentence,
+                            },
+                        ],
+                    }
+                ]
+                inputs = processor.apply_chat_template(
+                    messages,
+                    tokenize=True,
+                    add_generation_prompt=False,
+                    return_dict=True,
+                    return_tensors="pt",
+                )
 
-            token_ids = inputs["input_ids"][0]
-            period_index = (token_ids == PERIOD_TOKEN_ID).nonzero(as_tuple=True)[0][-1].item()
-            critical_word_final_token_index = period_index - 1
+                token_ids = inputs["input_ids"][0]
+                period_index = (token_ids == PERIOD_TOKEN_ID).nonzero(as_tuple=True)[0][-1].item()
+                extraction_index = period_index - 1
 
             inputs = inputs.to(model.device)
             with torch.inference_mode():
@@ -139,7 +150,10 @@ def extract_hidden_states(model_id):
 
             hidden_states = outputs.hidden_states[1:] # exclude embedding state 0
 
-            critical_word_hidden_states = torch.stack([layer_hidden_state[0, critical_word_final_token_index] for layer_hidden_state in hidden_states], dim=0).to(device="cpu", dtype=torch.float32)  # num_layers x hidden_size
+            critical_word_hidden_states = torch.stack([layer_hidden_state[0, extraction_index] for layer_hidden_state in hidden_states], dim=0).to(device="cpu", dtype=torch.float32)  # num_layers x hidden_size
+
+            if not torch.isfinite(critical_word_hidden_states).all():
+                raise ValueError(f"Nonfinite hidden states for {model_id}, item {item_index}.")
 
             name = f"{item_index}_{image_word}_{condition}.pt"
             path = HIDDEN_STATES_DIR / name
