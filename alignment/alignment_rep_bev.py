@@ -16,12 +16,14 @@ with open(MODELS_DIR / "models_lookup.json", "r", encoding="utf-8") as file:
 # human_df = pd.read_csv(HUMAN_PATH)
 # human_df = (human_df.groupby(["item_index", "image_word", "condition"], as_index=False)["rating"].mean())
 
-def get_alignment(model_id):
+def get_alignment(model_id, instructions=False):
     model_dir = MODELS_DIR / model_id
-    output_dir = model_dir / "alignment"
+    decoding_folder = "decoding_instruction" if instructions else "decoding"
+    alignment_folder = "alignment_instruction" if instructions else "alignment"
+    output_dir = model_dir / alignment_folder
     output_dir.mkdir(exist_ok=True)
 
-    classifier_results_df = pd.read_csv(model_dir / "decoding" / "results.csv")
+    classifier_results_df = pd.read_csv(model_dir / decoding_folder / "results.csv")
     behavioral_results_df = pd.read_csv(model_dir / "behavior" / "ratings.csv")
 
     combined_df = classifier_results_df.merge(
