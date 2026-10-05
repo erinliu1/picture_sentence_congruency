@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 MODELS_DIR = Path("/Intern/Erin/picture_sentence_congruency/models")
-PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/alignment/plots/gemma3_instruction")
+PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/alignment/plots")
 
 
 def plot_instruction_comparison(model_id):
     """Save a blue/pink coefficient comparison with pointwise 95% confidence bands."""
     with (MODELS_DIR / "models_lookup.json").open(encoding="utf-8") as file:
-        title = json.load(file)[model_id]["title"]
+        info = json.load(file)[model_id]
+        title = info["title"]
+    plots_dir = PLOTS_DIR / f"{info['family']}_instruction"
 
     # Load both conditions before creating a figure, so missing inputs fail cleanly.
     conditions = []
@@ -53,8 +55,8 @@ def plot_instruction_comparison(model_id):
     ax.legend(fontsize=15, loc="lower right", framealpha=0.9)
     fig.tight_layout()
 
-    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = PLOTS_DIR / f"{model_id}_instruction_comparison.png"
+    plots_dir.mkdir(parents=True, exist_ok=True)
+    out_path = plots_dir / f"{model_id}_instruction_comparison.png"
     fig.savefig(out_path, bbox_inches="tight", dpi=150)
     plt.close(fig)
     print(f"Saved {out_path}")

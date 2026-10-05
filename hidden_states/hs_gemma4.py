@@ -1,4 +1,4 @@
-# For every stimulus, feed to each Gemma 4 model, pull out the model's internal hidden states at the last word of the sentence, for every layer.
+# Extract per-layer critical-word states or instruction-conditioned first-response states.
 # Saves a .pt file per stimulus, naming convention as {item_index}_{image_word}_{condition}.pt
 # item_index is the order of the stimulus in the sentences.json
 
@@ -8,7 +8,6 @@ import json
 import random
 
 import numpy as np
-import torch
 
 from pathlib import Path
 
@@ -17,6 +16,13 @@ load_dotenv()
 
 from prepare_cuda import prepare_cuda
 prepare_cuda(allow_multi_gpu=False)
+
+import torch
+import sys
+
+# Share behavioral input construction without importing its GPU extraction module.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "behavioral"))
+from gemma4_prompt import build_rating_inputs
 
 from PIL import Image
 from tqdm import tqdm
@@ -76,7 +82,8 @@ GEMMA4_BASE_MOE_LOOKUP = {
     "gemma4_26b_a4b_base": "google/gemma-4-26B-A4B",
 }
 
-def extract_hidden_states(model_id):
+def extract_hidden_states(model_id, instructions=False):
+    """Extract critical-word states or instruction-conditioned first-response states."""
     if model_id in GEMMA4_DENSE_LOOKUP:
         model_name = GEMMA4_DENSE_LOOKUP[model_id]
         is_base = False
@@ -99,9 +106,12 @@ def extract_hidden_states(model_id):
         device_map = {"": 0}
     else:
         return
+    if instructions and is_base:
+        raise ValueError("Rating instructions require an instruction-tuned Gemma4 model.")
     title = models_lookup[model_id]["title"]
 
-    HIDDEN_STATES_DIR = Path(f"/Intern/Erin/picture_sentence_congruency/models/{model_id}/hidden_states")
+    states_folder = "hidden_states_instruction" if instructions else "hidden_states"
+    HIDDEN_STATES_DIR = MODELS_DIR / model_id / states_folder
     HIDDEN_STATES_DIR.mkdir(parents=True, exist_ok=True)
 
     model = AutoModelForImageTextToText.from_pretrained(
@@ -113,10 +123,11 @@ def extract_hidden_states(model_id):
     model.eval()
     processor = AutoProcessor.from_pretrained(model_name)
 
-    period_ids = processor.tokenizer.encode(".", add_special_tokens=False)
-    if len(period_ids) != 1:
-        raise ValueError(f"expected a single token ID for the period, but {model_id} gave {period_ids}")
-    PERIOD_TOKEN_ID = period_ids[0]
+    if not instructions:
+        period_ids = processor.tokenizer.encode(".", add_special_tokens=False)
+        if len(period_ids) != 1:
+            raise ValueError(f"expected a single token ID for the period, but {model_id} gave {period_ids}")
+        PERIOD_TOKEN_ID = period_ids[0]
 
     for item_index, item in enumerate(tqdm(sentences, desc=f"Extracting hidden states for {title}")):
         sentence_frame = item['sentence_frame']
@@ -132,7 +143,9 @@ def extract_hidden_states(model_id):
             image_path = PICTURES_DIR / f"{image_word}.png"
             image = Image.open(image_path).convert("RGB")
 
-            if is_base:
+            if instructions:
+                inputs = build_rating_inputs(processor, image, sentence)
+            elif is_base:
                 prompt = f"<|image|> {sentence}"
                 inputs = processor(text=prompt, images=image, return_tensors="pt")
             else:
@@ -159,9 +172,13 @@ def extract_hidden_states(model_id):
                     return_tensors="pt",
                 )
 
-            token_ids = inputs["input_ids"][0]
-            period_index = (token_ids == PERIOD_TOKEN_ID).nonzero(as_tuple=True)[0][-1].item()
-            critical_word_final_token_index = period_index - 1
+            if instructions:
+                # This final input position predicts the rating; no response digit is appended.
+                extraction_index = -1
+            else:
+                token_ids = inputs["input_ids"][0]
+                period_index = (token_ids == PERIOD_TOKEN_ID).nonzero(as_tuple=True)[0][-1].item()
+                extraction_index = period_index - 1
 
             inputs = inputs.to(model.device)
             with torch.inference_mode():
@@ -174,11 +191,11 @@ def extract_hidden_states(model_id):
 
             hidden_states = outputs.hidden_states[1:] # exclude embedding state 0
 
-            critical_word_hidden_states = torch.stack([layer_hidden_state[0, critical_word_final_token_index] for layer_hidden_state in hidden_states], dim=0).to(device="cpu", dtype=torch.float32)  # num_layers x hidden_size
+            extracted_hidden_states = torch.stack([layer_hidden_state[0, extraction_index] for layer_hidden_state in hidden_states], dim=0).to(device="cpu", dtype=torch.float32)  # num_layers x hidden_size
 
             name = f"{item_index}_{image_word}_{condition}.pt"
             path = HIDDEN_STATES_DIR / name
-            torch.save(critical_word_hidden_states, path)
+            torch.save(extracted_hidden_states, path)
 
     print(f"Hidden states for {model_id} saved.")
     del model
