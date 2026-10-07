@@ -14,6 +14,14 @@ correlation_df = pd.read_csv(BEHAVIORAL_DIR / "correlation.csv")
 
 DECODING_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/results")
 decoding_df = pd.read_csv(DECODING_DIR / "summary.csv")
+# Preserve these plots' critical-word comparison with the new summary format.
+decoding_df = decoding_df.loc[decoding_df["decoding"] == "critical_word"].rename(
+    columns={
+        "model_id": "source",
+        "peak_accuracy": "peak_decoding_accuracy",
+        "final_layer_accuracy": "last_layer_decoding_accuracy",
+    }
+)[["source", "peak_decoding_accuracy", "last_layer_decoding_accuracy"]]
 
 family_lookup = {
     "qwen": {

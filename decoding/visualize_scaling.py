@@ -13,7 +13,19 @@ DECODING_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/results")
 ALIGNMENT_DIR = Path("/Intern/Erin/picture_sentence_congruency/alignment/results")
 PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/plots")
 decoding_df = pd.read_csv(DECODING_DIR / "summary.csv")
+# Preserve these plots' critical-word comparison with the new summary format.
+decoding_df = decoding_df.loc[decoding_df["decoding"] == "critical_word"].rename(
+    columns={
+        "model_id": "source",
+        "peak_accuracy": "peak_decoding_accuracy",
+        "final_layer_accuracy": "last_layer_decoding_accuracy",
+    }
+)[["source", "peak_decoding_accuracy", "last_layer_decoding_accuracy"]]
 alignment_df = pd.read_csv(ALIGNMENT_DIR / "alignment_summary.csv")
+# Keep the scaling comparison on critical-word alignment.
+alignment_df = alignment_df.loc[alignment_df["decoding"] == "critical_word"].rename(
+    columns={"model_id": "source", "peak_coeff": "max_coeff"}
+)[["source", "max_coeff"]].dropna(subset=["max_coeff"])
 
 family_lookup = {
     "qwen": {"label": "Qwen3-VL"},

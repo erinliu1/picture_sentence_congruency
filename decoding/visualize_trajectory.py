@@ -1,4 +1,5 @@
 import json
+import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -24,9 +25,10 @@ PLOTS_DIR = Path("/Intern/Erin/picture_sentence_congruency/decoding/plots")
 N_POINTS = 101
 common_grid = np.linspace(0, 1, N_POINTS)
 
-decoding_color = "tab:green"   # green (instruct)
+decoding_color = "tab:green"   # instruction-tuned, without instructions
+instruction_color = "tab:pink"
 decoding_base_color = "tab:orange"  # orange (base / pretrained, non-instruction-tuned)
-alignment_color = "tab:purple"  # purple
+alignment_color = "tab:green"  # instruction-tuned, with instructions
 
 # Base (pretrained, non-instruction-tuned) counterparts don't go through the alignment stage
 # (no human-rating regression has been run for them), so they only contribute a second decoding
@@ -46,15 +48,17 @@ def mean_and_ci(stacked):
 
 
 decoding_curves = []
+decoding_instruction_curves = []
 decoding_base_curves = []
 alignment_curves = []
+alignment_instruction_curves = []
 significance_thresholds = []
 
 for model_id, info in models_lookup.items():
     model_dir = MODELS_DIR / model_id
     is_base = info["family"] in BASE_FAMILIES
 
-    accuracy_df = pd.read_csv(model_dir / "decoding" / "layerwise_accuracy.csv")
+    accuracy_df = pd.read_csv(model_dir / "decoding" / "layerwise_accuracy.csv").sort_values("layer_index")
     depth = normalized_layers(accuracy_df["layer_index"])
     interpolated_accuracy = np.interp(common_grid, depth, accuracy_df["all_accuracy"])
 
@@ -69,16 +73,33 @@ for model_id, info in models_lookup.items():
     significance_df = pd.read_csv(model_dir / "decoding" / "layerwise_significance.csv")
     significance_thresholds.append(significance_df["threshold_95"].iloc[0])
 
-    coefficients_df = pd.read_csv(model_dir / "alignment" / "coefficients.csv")
+    coefficients_df = pd.read_csv(model_dir / "alignment" / "coefficients.csv").sort_values("layer_index")
     depth = normalized_layers(coefficients_df["layer_index"])
     # Normalize each model's own trajectory by its own peak, so every model
     # contributes on the same 0-1-ish "fraction of its max alignment" scale.
     peak_normalized_coeff = coefficients_df["coefficient"] / coefficients_df["coefficient"].max()
     alignment_curves.append(np.interp(common_grid, depth, peak_normalized_coeff))
 
+    for folder, filename, value_column, curves in [
+        ("decoding_instruction", "layerwise_accuracy.csv", "all_accuracy", decoding_instruction_curves),
+        ("alignment_instruction", "coefficients.csv", "coefficient", alignment_instruction_curves),
+    ]:
+        result_path = model_dir / folder / filename
+        if not result_path.exists():
+            warnings.warn(f"Skipping missing instruction-conditioned results: {result_path}")
+            continue
+        result_df = pd.read_csv(result_path).sort_values("layer_index")
+        depth = normalized_layers(result_df["layer_index"])
+        values = result_df[value_column]
+        if value_column == "coefficient":
+            values = values / values.max()
+        curves.append(np.interp(common_grid, depth, values))
+
 decoding_mean, decoding_lower, decoding_upper = mean_and_ci(np.stack(decoding_curves))
+decoding_instruction_mean, decoding_instruction_lower, decoding_instruction_upper = mean_and_ci(np.stack(decoding_instruction_curves))
 decoding_base_mean, decoding_base_lower, decoding_base_upper = mean_and_ci(np.stack(decoding_base_curves))
 alignment_mean, alignment_lower, alignment_upper = mean_and_ci(np.stack(alignment_curves))
+alignment_instruction_mean, alignment_instruction_lower, alignment_instruction_upper = mean_and_ci(np.stack(alignment_instruction_curves))
 average_significance_threshold = np.mean(significance_thresholds)
 
 LABEL_FS = 22
@@ -86,9 +107,11 @@ TICK_FS = 18
 
 fig, (ax_dec, ax_align) = plt.subplots(1, 2, figsize=(11, 4), gridspec_kw={"wspace": 0.55})
 
-ax_dec.plot(common_grid, decoding_mean, color=decoding_color, linewidth=5, zorder=2, label="Instruct")
+ax_dec.plot(common_grid, decoding_mean, color=decoding_color, linewidth=5, zorder=2)
 ax_dec.fill_between(common_grid, decoding_lower, decoding_upper, color=decoding_color, alpha=0.2)
-ax_dec.plot(common_grid, decoding_base_mean, color=decoding_base_color, linewidth=5, zorder=2, label="Base")
+ax_dec.plot(common_grid, decoding_instruction_mean, color=instruction_color, linestyle="--", linewidth=5, zorder=2)
+ax_dec.fill_between(common_grid, decoding_instruction_lower, decoding_instruction_upper, color=instruction_color, alpha=0.2)
+ax_dec.plot(common_grid, decoding_base_mean, color=decoding_base_color, linewidth=5, zorder=2, label="   Base Model\n@ critical word")
 ax_dec.fill_between(common_grid, decoding_base_lower, decoding_base_upper, color=decoding_base_color, alpha=0.2)
 ax_dec.legend(fontsize=14, loc="lower right", bbox_to_anchor=(1, 0.2), framealpha=0.9)
 ax_dec.axhline(
@@ -99,17 +122,22 @@ ax_dec.axhline(
     zorder=1,
 )
 ax_dec.text(
-    0.07,
+    0.2,
     average_significance_threshold - 0.035,
     f"average significance threshold",
     color="gray",
-    fontsize=14,
+    fontsize=12,
     # ha="left",
     # va="bottom",
 )
 
-ax_align.plot(common_grid, alignment_mean, color=alignment_color, linewidth=4, zorder=2)
-ax_align.fill_between(common_grid, alignment_lower, alignment_upper, color=alignment_color, alpha=0.2)
+ax_align.plot(common_grid, alignment_instruction_mean, color=alignment_color, linewidth=4, zorder=2,
+              label="Instruct Model\n@ critical word")
+ax_align.fill_between(common_grid, alignment_instruction_lower, alignment_instruction_upper, color=alignment_color, alpha=0.2)
+ax_align.plot(common_grid, alignment_mean, color=instruction_color, linestyle="--", linewidth=4, zorder=2,
+              label="Instruct Model\n@rating readout")
+ax_align.fill_between(common_grid, alignment_lower, alignment_upper, color=instruction_color, alpha=0.2)
+ax_align.legend(fontsize=14, loc="lower right", framealpha=0.9)
 
 for ax in (ax_dec, ax_align):
     ax.set_xlim(0, 1)
@@ -138,26 +166,20 @@ fig.savefig(PLOTS_DIR / "trajectory.png", bbox_inches="tight", dpi=150)
 plt.show()
 
 caption = (
-    "Average decoding accuracy trajectory and average alignment coefficient trajectory "
-    "relative to model peak, across normalized network depth (28 instruction-tuned models, "
-    "plus 14 base/pretrained counterparts on the left panel only). Left: the layerwise "
-    "congruent-vs-incongruent decoding accuracy of each model was interpolated onto 101 "
-    "evenly spaced normalized depth positions (0 = first hidden-state layer, 1 = last), "
-    "then averaged separately across the 28 instruction-tuned models (green) and the 14 "
-    "base models (orange); each shaded band is the 95% CI of the across-model mean at each "
-    "depth for that group. Base models don't have a permutation-significance or alignment "
-    "stage run, so they contribute only this decoding curve. The dotted gray line marks the "
-    "average permutation-based 95th-percentile significance threshold (from "
-    "layerwise_significance.csv), averaged across the 28 instruction-tuned models. Right: "
-    "each instruction-tuned model's layerwise alignment coefficient "
-    "(the OLS regression coefficient of human congruency ratings on the model's decoded "
-    "congruent-probability) was first divided by that model's own peak coefficient, so "
-    "every model's trajectory has a peak of 1 regardless of its absolute alignment "
-    "strength; these peak-normalized trajectories were then interpolated onto the same "
-    "101-point normalized-depth grid and averaged across all 28 models, with the shaded "
-    "band showing the 95% CI of the across-model mean. Together the two panels show the "
-    "common layerwise shape of decodability and human-alignment across architecturally "
-    "and scale-diverse vision-language models."
+    "Average decoding accuracy and peak-normalized alignment trajectories across relative "
+    "network depth. Each trajectory is interpolated onto 101 evenly spaced positions "
+    "(0 = first hidden-state layer, 1 = last); shaded bands show the 95% CI of the "
+    "across-model mean. Left: instruction-tuned models without instructions "
+    f"(green, n={len(decoding_curves)}), instruction-tuned models with instructions "
+    f"(pink dashed, n={len(decoding_instruction_curves)}), and base/pretrained models "
+    f"(orange, n={len(decoding_base_curves)}). The dashed gray line marks the average "
+    "permutation-based 95th-percentile significance threshold from the instruction-tuned "
+    "models without instructions. Right: instruction-tuned models with instructions "
+    f"(green, n={len(alignment_instruction_curves)}) and without instructions "
+    f"(pink dashed, n={len(alignment_curves)}). Each model's alignment coefficients "
+    "are divided by their own peak within each condition before interpolation and averaging. "
+    "Base models contribute only to decoding. Missing instruction-conditioned results "
+    "are omitted from their respective averages."
 )
 with open(PLOTS_DIR / "trajectory_caption.txt", "w", encoding="utf-8") as file:
     file.write(caption + "\n")
