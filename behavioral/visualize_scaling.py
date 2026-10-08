@@ -35,12 +35,6 @@ family_colors = {
     "gemma3": "#ffd42b",   # amber
     "gemma4": "#DC2626",   # red-orange
 }
-family_linestyles = {
-    "glm": "--",
-    "gemma4": ":",
-    "intern": ":",
-    "gemma3": "--",
-}
 
 plot_df = accuracy_df.merge(concordance_df, on="source").merge(correlation_df, on="source")
 plot_df = plot_df[plot_df["source"].isin(models_lookup)].copy()
@@ -64,7 +58,6 @@ fig, (ax_acc, ax_conc, ax_rho) = plt.subplots(
 for family, family_df in plot_df.groupby("family", observed=True, sort=False):
     family_df = family_df.sort_values("params_b")
     color = family_colors[family]
-    linestyle = family_linestyles.get(family, "-")
 
     for ax, metric in ((ax_acc, "accuracy"), (ax_conc, "concordance"), (ax_rho, "spearman_rho")):
         points = family_df[["params_b", metric]].dropna()
@@ -80,7 +73,10 @@ for family, family_df in plot_df.groupby("family", observed=True, sort=False):
             y_smooth = PchipInterpolator(log_x, y)(log_x_smooth)
         else:
             x_smooth, y_smooth = x, y
-        ax.plot(x_smooth, y_smooth, color=color, linestyle=linestyle, linewidth=5, zorder=2)
+        ax.plot(x_smooth, y_smooth, color=color, linestyle="-", linewidth=3,
+                alpha=0.65, zorder=2)
+        ax.scatter(x, y, color=color, s=40, alpha=0.8, edgecolors="none",
+                   zorder=3)
 
 for ax in (ax_acc, ax_conc, ax_rho):
     ax.set_xscale("log")
@@ -100,8 +96,12 @@ family_handles = [
     Line2D(
         [0], [0],
         color=family_colors[family],
-        linestyle=family_linestyles.get(family, "-"),
-        linewidth=5,
+        linestyle="-",
+        linewidth=3,
+        alpha=0.8,
+        marker="o",
+        markeredgecolor="none",
+        markersize=6,
         label=info["label"],
     )
     for family, info in family_lookup.items()
@@ -121,7 +121,7 @@ fig.subplots_adjust(left=0.04, right=0.99, top=0.9159, bottom=0.4673)
 PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 fig.savefig(PLOTS_DIR / "scaling_smoothed.pdf", bbox_inches="tight")
 fig.savefig(PLOTS_DIR / "scaling_smoothed.png", bbox_inches="tight", dpi=600)
-caption = """Behavioral performance as a function of model size. Panels show classification accuracy (left), within-item concordance (center), and Spearman rank correlation with mean human ratings (right) for 28 instruction-tuned vision-language models across seven families. Each model is evaluated on 320 picture-sentence pairs from 80 stimulus sets; individual model markers are omitted. Accuracy classifies a pair as congruent when its expected 1-5 rating is greater than 3 and incongruent otherwise. Concordance is the proportion of the four within-item comparisons in which a congruent pair receives a strictly higher rating than an incongruent pair, averaged over items; ties do not count as concordant. Spearman's rho compares model and human ratings across matched picture-sentence pairs. Colors identify model families. The horizontal axis is logarithmic and uses the leading numeric value of the registered model-size label in billions (total rather than active parameters for MoE models). Curves use shape-preserving PCHIP interpolation in log-size space for families with at least three models; two-model families are joined by straight segments. Curves are visual guides through measured model values, not fitted scaling laws. No uncertainty intervals are shown.
+caption = """Behavioral performance as a function of model size. Panels show classification accuracy (left), within-item concordance (center), and Spearman rank correlation with mean human ratings (right) for 28 instruction-tuned vision-language models across seven families. Each model is evaluated on 320 picture-sentence pairs from 80 stimulus sets; individual models are shown as small, partially transparent points without borders. Accuracy classifies a pair as congruent when its expected 1-5 rating is greater than 3 and incongruent otherwise. Concordance is the proportion of the four within-item comparisons in which a congruent pair receives a strictly higher rating than an incongruent pair, averaged over items; ties do not count as concordant. Spearman's rho compares model and human ratings across matched picture-sentence pairs. Colors identify model families. All curves are solid and partially transparent. The horizontal axis is logarithmic and uses the leading numeric value of the registered model-size label in billions (total rather than active parameters for MoE models). Curves use shape-preserving PCHIP interpolation in log-size space for families with at least three models; two-model families are joined by straight segments. Curves are visual guides through measured model values, not fitted scaling laws. No uncertainty intervals are shown.
 """
 (PLOTS_DIR / "scaling_smoothed.txt").write_text(caption, encoding="utf-8")
 plt.close(fig)
