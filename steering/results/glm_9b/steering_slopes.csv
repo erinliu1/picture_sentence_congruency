@@ -1,0 +1,2 @@
+model_id,layer,slope,bootstrap_ci_lower,bootstrap_ci_upper
+glm_9b,20,0.3072656250000001,0.28849609374999996,0.3265234375

@@ -2,7 +2,9 @@
 
 The prompt is identical to the instruction-conditioned behavioral prompt. For
 each fold and layer, steering changes only the final prompt token by
-``k * s_train * scaler.scale_ * w_hat``. Layers before the final layer are
+``k * s_train * scaler.scale_ * w_hat``. GLM instead intervenes on the box
+marker consumed in the second generation step, matching its rating readout.
+Layers before the final layer are
 intervened on at the corresponding decoder-block output; the final layer is
 intervened on after the model's final RMSNorm, matching the representation
 saved during hidden-state extraction. Outputs are saved beside the probe under
@@ -22,6 +24,7 @@ K_VALUES = [-2, -1, 0, 1, 2]
 FOLDS = range(1, 11)
 N_BOOTSTRAPS = 10_000
 BOOTSTRAP_SEED = 20261010
+BOX_TOKEN_ID = None
 GPU_INDEX = os.environ.get("STEERING_GPU", "1")
 
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_INDEX
@@ -40,15 +43,9 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image
-from transformers import AutoConfig, AutoProcessor, Qwen3VLForConditionalGeneration
+from transformers import AutoConfig, AutoProcessor, AutoModelForImageTextToText
 
 from qwen_prompt import build_rating_inputs
-
-if LAYERS is None:
-    # get all decoder-layer indices from the locally cached model config
-    config = AutoConfig.from_pretrained(model_name, local_files_only=True)
-    text_config = getattr(config, "text_config", config)
-    LAYERS = list(range(text_config.num_hidden_layers))
 
 def get_prompt(processor, item_index, image_word, condition):
     """Build the exact instruction-conditioned behavioral prompt for one item."""
@@ -94,9 +91,23 @@ def get_baseline_logits(model, inputs, rating_token_ids):
     """Run an unmodified forward pass and return rating-logit metrics."""
     inputs = inputs.to(model.device)
     with torch.inference_mode():
+        if MODEL_ID == "glm_9b":
+            return _summarize_logits(_glm_rating_logits(model, inputs)[0], rating_token_ids)
         outputs = model(**inputs, return_dict=True, use_cache=False, logits_to_keep=1)
     logits = outputs.logits[0, -1, :]
     return _summarize_logits(logits, rating_token_ids)
+
+
+def _glm_rating_logits(model, inputs):
+    """Score the digit after GLM's box marker using the extraction's cached flow."""
+    outputs = model.generate(
+        **inputs, max_new_tokens=2, do_sample=False, use_cache=True,
+        output_logits=True, return_dict_in_generate=True,
+    )
+    generated = outputs.sequences[:, inputs["input_ids"].shape[1]:]
+    if BOX_TOKEN_ID is None or generated.shape[1] != 2 or not (generated[:, 0] == BOX_TOKEN_ID).all():
+        raise ValueError("Expected GLM box token followed by rating")
+    return outputs.logits[1]
 
 
 def _repeat_inputs(inputs, count):
@@ -134,7 +145,8 @@ def _load_steering_step(fold, layer):
 def get_steered_logits(model, inputs, fold, layer, k_list, rating_token_ids):
     """Return rating-logit metrics after each requested probe-direction intervention.
 
-    All ``k`` conditions are evaluated in one batch. The intervention at the
+    Qwen's ``k`` conditions are evaluated in one batch; other models use individual
+    passes to preserve the baseline's numerical execution shape. The intervention at the
     selected representation is ``k * s_train * scaler.scale_ * w_hat`` and is
     applied only to the final prompt-token hidden state. The final layer uses
     the post-RMSNorm output because that is the space used to train its probe.
@@ -142,6 +154,13 @@ def get_steered_logits(model, inputs, fold, layer, k_list, rating_token_ids):
     k_values = np.asarray(k_list, dtype=np.float64)
     if k_values.ndim != 1 or k_values.size == 0 or not np.isfinite(k_values).all():
         raise ValueError("k_list must be a nonempty sequence of finite values")
+    # Keep these models in the same single-example execution shape as the
+    # baseline, avoiding the batch-size artifacts observed with Gemma.
+    if MODEL_ID in {"gemma3_4b", "internvl3_1b_instruct", "glm_9b"} and len(k_values) > 1:
+        return [
+            get_steered_logits(model, inputs, fold, layer, [k], rating_token_ids)[0]
+            for k in k_values
+        ]
     decoder = model.model.language_model
     if layer < 0 or layer >= len(decoder.layers):
         raise ValueError(f"Layer {layer} is outside 0..{len(decoder.layers) - 1}")
@@ -158,6 +177,8 @@ def get_steered_logits(model, inputs, fold, layer, k_list, rating_token_ids):
 
     def steer_final_token(module, args, output):
         hidden = output[0] if isinstance(output, (tuple, list)) else output
+        if MODEL_ID == "glm_9b" and hidden.shape[1] != 1:
+            return output
         hook_calls.append(1)
         steered = hidden.clone()
         steered[:, -1, :] = (hidden[:, -1, :].float() + deltas).to(hidden.dtype)
@@ -170,15 +191,18 @@ def get_steered_logits(model, inputs, fold, layer, k_list, rating_token_ids):
     handle = intervention_module.register_forward_hook(steer_final_token)
     try:
         with torch.inference_mode():
-            outputs = model(
-                **batched_inputs, return_dict=True, use_cache=False, logits_to_keep=1
-            )
+            if MODEL_ID == "glm_9b":
+                logits = _glm_rating_logits(model, batched_inputs)
+            else:
+                outputs = model(
+                    **batched_inputs, return_dict=True, use_cache=False, logits_to_keep=1
+                )
+                logits = outputs.logits[:, -1, :]
     finally:
         handle.remove()
     if len(hook_calls) != 1:
         raise AssertionError(f"Expected one hook call, observed {len(hook_calls)}")
 
-    logits = outputs.logits[:, -1, :]
     return [
         {"k": float(k), **_summarize_logits(row_logits, rating_token_ids)}
         for k, row_logits in zip(k_values, logits, strict=True)
@@ -200,10 +224,17 @@ def _save_fold_layer(model, rating_token_ids, fold, layer, k_list, baselines):
         ROOT_DIR / "models" / MODEL_ID / "steering" / f"layer{layer}" / f"fold{fold}"
     )
     steered_rows = []
-    for metadata, inputs, _baseline_metrics in baselines.values():
+    for metadata, inputs, baseline_metrics in baselines.values():
         for metrics in get_steered_logits(
             model, inputs, fold, layer, k_list, rating_token_ids
         ):
+            if MODEL_ID in {"gemma3_4b", "internvl3_1b_instruct", "glm_9b"} and metrics["k"] == 0:
+                np.testing.assert_allclose(
+                    [metrics[f"l{i}"] for i in range(1, 6)],
+                    [baseline_metrics[f"l{i}"] for i in range(1, 6)],
+                    rtol=0, atol=0,
+                    err_msg="k=0 must reproduce the single-example baseline",
+                )
             steered_rows.append({**metadata, **metrics})
 
     baseline_columns = [
@@ -255,21 +286,41 @@ def _bootstrap_summary(combined, layers):
     return pd.DataFrame(rows)
 
 
-def process_all(layers=None, k_list=None):
+def process_all(layers=None, k_list=None, model_id="qwen3_vl_8b_instruct"):
     """Process every fold for selected layers and save the aggregate summary."""
-    layers = LAYERS if layers is None else [int(layer) for layer in layers]
+    global MODEL_ID, MODEL_NAME, build_rating_inputs, BOX_TOKEN_ID
+    MODEL_ID = model_id
+    if model_id == "gemma3_4b":
+        MODEL_NAME = "google/gemma-3-4b-it"
+        from gemma3_prompt import build_rating_inputs
+    elif model_id == "internvl3_1b_instruct":
+        MODEL_NAME = "OpenGVLab/InternVL3-1B-hf"
+        from intern_prompt import build_rating_inputs
+    elif model_id == "glm_9b":
+        MODEL_NAME = "zai-org/GLM-4.6V-Flash"
+        from glm_prompt import build_rating_inputs
+    elif model_id == "qwen3_vl_8b_instruct":
+        MODEL_NAME = "Qwen/Qwen3-VL-8B-Instruct"
+        from qwen_prompt import build_rating_inputs
+    else:
+        raise ValueError(f"Unsupported steering model: {model_id}")
+    if layers is None:
+        config = AutoConfig.from_pretrained(MODEL_NAME, local_files_only=True)
+        text_config = getattr(config, "text_config", config)
+        layers = list(range(text_config.num_hidden_layers)) if LAYERS is None else LAYERS
+    layers = [int(layer) for layer in layers]
     k_list = K_VALUES if k_list is None else list(k_list)
     if not layers:
         raise ValueError("At least one layer is required")
     if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is required for the Qwen bfloat16 steering run")
+        raise RuntimeError("CUDA is required for the bfloat16 steering run")
 
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
-    model = Qwen3VLForConditionalGeneration.from_pretrained(
+    model = AutoModelForImageTextToText.from_pretrained(
         MODEL_NAME,
         dtype=torch.bfloat16,
         device_map={"": 0},
@@ -277,6 +328,10 @@ def process_all(layers=None, k_list=None):
         local_files_only=True,
     ).eval()
     processor = AutoProcessor.from_pretrained(MODEL_NAME, local_files_only=True)
+    if MODEL_ID == "glm_9b":
+        BOX_TOKEN_ID = processor.tokenizer.convert_tokens_to_ids("<|begin_of_box|>")
+        if BOX_TOKEN_ID is None or BOX_TOKEN_ID == processor.tokenizer.unk_token_id:
+            raise ValueError("Missing GLM box token")
     rating_token_ids = _get_rating_token_ids(processor)
 
     combined_tables = []

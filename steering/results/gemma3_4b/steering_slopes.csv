@@ -1,0 +1,2 @@
+model_id,layer,slope,bootstrap_ci_lower,bootstrap_ci_upper
+gemma3_4b,19,0.4620898437500001,0.36458837890624995,0.5658818359375

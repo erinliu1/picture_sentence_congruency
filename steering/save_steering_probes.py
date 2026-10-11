@@ -37,7 +37,7 @@ def probe_path(model_dir, layer, fold):
     return model_dir / "steering" / f"layer{layer}" / f"fold{fold}" / "probe.joblib"
 
 
-def save_steering_probes(model_id):
+def save_steering_probes(model_id, layers=None):
     model_dir = ROOT_DIR / "models" / model_id
     accuracy_path = model_dir / "decoding_instruction/layerwise_accuracy.csv"
     accuracy = pd.read_csv(accuracy_path).sort_values("layer_index").reset_index(drop=True)
@@ -46,15 +46,18 @@ def save_steering_probes(model_id):
     if accuracy.layer_index.duplicated().any():
         raise ValueError("Duplicate layer indices")
     final_layer = int(accuracy.layer_index.max())
-    layers = accuracy.layer_index.astype(int).tolist()
-    if layers != list(range(final_layer + 1)):
-        raise ValueError(f"Expected contiguous layers 0 through {final_layer}: {layers}")
+    available_layers = accuracy.layer_index.astype(int).tolist()
+    if available_layers != list(range(final_layer + 1)):
+        raise ValueError(f"Expected contiguous layers 0 through {final_layer}: {available_layers}")
+    layers = available_layers if layers is None else [int(layer) for layer in layers]
+    if not layers or len(set(layers)) != len(layers) or not set(layers) <= set(available_layers):
+        raise ValueError(f"Invalid selected layers: {layers}")
     cv_bytes = CV_PATH.read_bytes()
     cv_lookup = json.loads(cv_bytes)
     if set(cv_lookup) != {str(fold) for fold in range(1, 11)}:
         raise ValueError("Expected CV folds 1 through 10")
     output_dir = model_dir / "steering"
-    if any(output_dir.rglob("*.joblib")):
+    if any(path for layer in layers for path in (output_dir / f"layer{layer}").rglob("*.joblib")):
         raise FileExistsError(f"Probe outputs already exist: {output_dir}")
 
     # Load every layer once; assemble examples in each fold's original nested
@@ -81,7 +84,7 @@ def save_steering_probes(model_id):
     if not original.index.is_unique:
         raise ValueError("Duplicate rows in original decoding results")
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Selected all layers: {layers}", flush=True)
+    print(f"Selected layers: {layers}", flush=True)
     for fold in tqdm(range(1, 11), desc="Fitting steering probes"):
         split = cv_lookup[str(fold)]
         train_names = [name for names in split["train"].values() for name in names]
@@ -92,19 +95,19 @@ def save_steering_probes(model_id):
         y_train = np.array([labels[name] for name in train_names], dtype=np.int64)
         X_test = np.stack([features[name] for name in test_names])
         y_test = np.array([labels[name] for name in test_names], dtype=np.int64)
-        for layer_pos, layer in enumerate(layers):
+        for layer in layers:
             pipeline = make_pipeline(
                 StandardScaler(),
                 LogisticRegression(C=0.01, solver="liblinear", max_iter=10_000, random_state=SEED),
             )
             with warnings.catch_warnings():
                 warnings.simplefilter("error", ConvergenceWarning)
-                pipeline.fit(X_train[:, layer_pos, :], y_train)
+                pipeline.fit(X_train[:, layer, :], y_train)
             path = probe_path(model_dir, layer, fold)
             path.parent.mkdir(parents=True, exist_ok=False)
             joblib.dump(pipeline, path)
             restored = joblib.load(path)
-            test_features = X_test[:, layer_pos, :]
+            test_features = X_test[:, layer, :]
             probabilities = restored.predict_proba(test_features)[:, 1]
             np.testing.assert_array_equal(probabilities, pipeline.predict_proba(test_features)[:, 1])
             predictions = restored.predict(test_features)

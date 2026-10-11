@@ -1,0 +1,2 @@
+model_id,layer,slope,bootstrap_ci_lower,bootstrap_ci_upper
+internvl3_1b_instruct,14,0.0516015625,0.045429199218749994,0.05775390625
